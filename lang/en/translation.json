@@ -1,0 +1,20 @@
+{
+    "projects": {
+        "header": {
+            "h2": "Projects",
+            "translate": {
+                "en": "English",
+                "fr": "French",
+                "ch": "Chinese"
+            },
+            "back": "Back"
+        },
+        "footer": {
+            "nav": {
+                "projects": "Projects",
+                "tasks": "Tasks",
+                "settings": "Settings"
+            }
+        }
+    }
+}

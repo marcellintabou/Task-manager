@@ -1,0 +1,20 @@
+{
+    "projects": {
+        "header": {
+            "h2": "项目",
+            "translate": {
+                "en": "英语",
+                "fr": "法国人",
+                "ch": "中国的"
+            },
+            "back": "后面"
+        },
+        "footer": {
+            "nav": {
+                "projects": "项目",
+                "tasks": "任务",
+                "settings": "设置"
+            }
+        }
+    }
+}

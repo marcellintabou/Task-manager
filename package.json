@@ -1,0 +1,14 @@
+{
+  "name": "Task-Manager",
+  "version": "1.0.0",
+  "author": {
+    "name": "Marcellin Tabou",
+    "email": "marcellintabou@gmail.com"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-requirejs": "~0.4.1",
+    "grunt-hash-manifest": "~0.4.0",
+    "grunt-manifest": "~0.4.0"
+  }
+}

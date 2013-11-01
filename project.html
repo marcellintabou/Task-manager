@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html manifest="manifest.appcache">
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="shortcut icon" href="favicon.png" type="image/png"/>
+    <title>projects</title>
+    <script data-main='js/main' src='js/lib/requirejs/require.js'></script>
+  </head>
+  <body>
+    <div data-role='page' id='projects' data-theme='a'>
+      <!-- header -->
+      <div data-role='header' data-mini='true' data-theme='b'>
+	      <a href='#index' data-role='button' data-icon='back' data-rel='back' data-mini='true' class='t' data-i18n='projects.header.back'>Back</a>
+	      <H2 class='t' data-i18n='projects.header.h2'>Projects</H2>
+	      <select name='translate' id='translate' data-mini='true'>
+          <option class='t' data-i18n='projects.header.translate.en' value='en'>English</option>
+          <option class='t' data-i18n='projects.header.translate.fr' value='fr'>French</option>
+          <option class='t' data-i18n='projects.header.translate.ch' value='ch'>Chinese</option>
+        </select>
+      </div>
+      <!-- content -->
+      <div data-role='content' id='pagecontent' data-theme='a'></div>
+      <!-- footer -->
+      <div data-role='footer' data-mini='true' data-position='fixed' data-theme='b'>
+	      <div data-role='controlgroup' data-type='horizontal' data-mini='true'>
+	        <a href='#' data-role='button' class='projectbutton' data-icon='arrow-u' class='t' data-i18n='projects.footer.nav.projects'>Projects</a>
+	        <a href='#index' class='tasklistbutton ui-btn-active' data-icon='arrow-r' data-role='button' data-direction='reverse' class='t' data-i18n='projects.footer.nav.tasks'>Tasks</a>
+	        <a href='settings.html' data-role='button' class='settingsbutton' data-icon='gear' class='t' data-i18n='projects.footer.nav.settings'>Settings</a>
+	      </div>
+      </div>
+    </div><!-- /page -->
+  </body>
+</html>
+

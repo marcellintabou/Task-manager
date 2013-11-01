@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Task manager tests</title>
+    <!--<script src="../js/require.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="mainTest.js"></script>
+    <script src="jquery.setNameSpace.js"></script>
+    -->
+
+    <script src="jquery.tag.inserter.js"></script>
+    <!--<script src="jquery.testHelper.js"></script>-->
+
+    <script data-main="../js/main" src="../js/lib/requirejs/require.js"></script>
+    <script src="qunit.js"></script>
+    <script src="jquery.testHelper.js"></script>
+    <script>
+	    $.testHelper = window.testHelper;
+      $.testHelper.asyncLoad([
+        [
+// 		      "jqm",
+// 		      "dateboxCoreMin",
+// 		      "dbxModeDateboxMin",
+// 		      "dbxModeCalboxMin",
+// 		      "dbxI18nEnUsUtf",
+// 		      "simpledialogMin",
+// 		      "gpretty_prettify",
+// 		      "renderjs",
+// 		      "jio",
+// 		      "md5",
+// 		      "response",
+// 		      "localstorage",
+// 		      "revisionstorage",
+// 		      "complex_queries",
+// 		      //pages modules
+// 		      "overrides"
+        ],
+        [],
+       // [ "jquery.mobile.init" ],
+        ["test.js"] //[ "collapsible_core.js"] //my index test file
+      ]);
+    </script>
+     <!--<link rel="stylesheet" href="../js/plugins/jquerymobile/jquery.mobile-1.3.1.css"/>-->
+    <link rel="stylesheet" href="qunit.css"/>
+    <!--<script src="swarminject.js"></script>-->
+    <style type="text/css">
+	    [data-role="page"], [data-role="dialog"] {
+			    position: absolute !important;
+			    top: -10000px !important;
+			}
+    </style>
+  </head>
+  <body>
+    <h1 id="qunit-header">Task manager unit test</h1>
+		<h2 id="qunit-banner"></h2>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests">
+		</ol>
+		<div data-role='page' id='index' data-theme='a'>
+       <!-- header-->
+      <div data-role='header' data-mini='true' data-position='fixed' data-theme='b' data-inset='true'>
+        <select name='sortby' id='sortby' data-mini='true'>
+          <option value='#'>sort by</option>
+          <option value='title'>Title</option>
+          <option value='begindate'>Begin date</option>
+          <option value='enddate'>End date</option>
+          <option value='state'>State</option>
+        </select>
+        <H2 class='indexhead'>Task manager</H2>
+        <a href='details.html' class='newtaskbutton ui-btn-right' data-icon='plus'>New task</a>
+      </div>
+      <!-- content-->
+      <div data-role='content' data-theme='a'>
+        <ol data-role='listview' class='content-listview' data-filter='true' data-inset='true' data-filter-placeholder='filter by title, state, date, project'></ol>
+      </div>
+      <!-- footer -->
+      <div data-role='footer' class='footercontent' data-mini='true' data-position='fixed' data-theme='b'>
+        <div data-role='controlgroup' data-type='horizontal' data-mini='true'>
+          <a href='project.html' data-role='button' class='projectbutton' data-icon='arrow-l'>Project</a>
+          <a href='#' class='tasklistbutton ui-btn-active' data-icon='arrow-u' data-role='button' >Task</a>
+          <a href='settings.html' data-role='button' class='settingsbutton' data-icon='gear'>Settings</a>
+        </div>
+      </div>
+    </div>
+  </body>  
+</html>

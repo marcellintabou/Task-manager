@@ -1,0 +1,322 @@
+@media (max-width: 480px) {
+  #settingscontentdiv {
+    border: 1px solid gray;
+    margin: auto !important
+  }
+	
+	  /**************************************/
+		/** RESPONSIBLE CSS FOR DETAILS PAGE **/
+				/* for date box*/
+  .date .ui-input-text {
+    display: block;
+    width: 95% !important;
+    padding: 1px
+  }
+/*
+  .ui-input-text .ui-body-c .ui-corner-all .ui-icon-datebox {
+    width: 90%;
+  }*/
+	/**  END DETAILS RESPONSIBLE **
+	******************************/
+  i {
+    color: gray;
+    font-size: 0.75em;
+  }
+
+  .myspan {
+    color: green;
+    font-size: 0.75em;
+  }
+
+  .titleSpan {
+    font-size: 0.8em;
+  }
+  
+    .ui-controlgroup{
+			text-align: center !important;
+			margin-left: 0.1em;
+		}
+}
+
+@media (min-width: 481px) and (max-width: 720px) {
+	/**************************************/
+	/** RESPONSIBLE SETTINGS PAGE **/
+  #settingscontentdiv {
+		/* background: none repeat scroll 0 0;*/
+    border: 1px solid gray;
+    width: 17em;
+    margin: auto;
+  }
+.ui-field-contain > label + [class*="ui-"], .ui-field-contain .ui-controlgroup-controls {
+	-moz-box-sizing: border-box;
+	float: left;
+	width: 100% !important;
+}
+
+/**************************************/
+/** RESPONSIBLE CSS FOR DETAILS PAGE **/
+  #myResult {
+    width: 45%;
+    margin: auto;
+  }
+				
+							/* for date box*/
+  .date .ui-input-text {
+    display: block;
+    width: 95% !important;
+    border: 0 solid;
+    padding: 1px;
+  }
+/*
+  .ui-input-text .ui-body-c .ui-corner-all .ui-icon-datebox {
+    width: 90%;
+  }
+*/
+  .ui-field-contain, .ui-mobile fieldset.ui-field-contain {
+    margin: auto;
+  }
+
+  .fieldcontain1.ui-field-contain.ui-body.ui-br {
+    padding: 0.8em;
+    text-align: left;
+    width: 95%;
+  }   
+
+ 	/******************************/
+	/**  END DETAILS RESPONSIBLE **/
+	/******************************/												
+  input {
+    width: 30%;
+    padding: 5px;
+  }
+
+  i {
+    color: brown;
+    font-size: 0.8em;
+  }
+
+  .myspan {
+    color: green;
+    font-size: 0.8em;
+  }
+
+  .titleSpan {
+    font-size: 0.85em;
+  }
+}
+
+@media (min-width: 721px) {
+	/*********************/
+	/*** SETTINGS PAGE ***/
+  /*********************/
+  #settingscontentdiv {
+    border: 1px solid gray;
+    width: 18em;
+    margin: auto;
+  }
+	/*#settings .ui-field-contain, #settings fieldset.ui-field-contain {
+    overflow: auto;
+  }*/
+		/**************************************/
+		/** RESPONSIBLE CSS FOR DETAILS PAGE **/
+  #myResult {
+    width: 32%;
+  }
+		
+			/* for date box*/
+  .date .ui-input-text {
+    display: block;
+    width: 100% !important;
+    border: 0 solid;
+    padding: 1px;
+  }
+
+  .cg .ui-controlgroup-controls {
+    display: inline-block;
+    width: auto;
+  }
+
+  .ui-field-contain, .ui-mobile fieldset.ui-field-contain {
+    margin: 0.1em 0;
+    padding: 0;
+  }
+
+  .ui-field-contain > label, .ui-field-contain .ui-controlgroup-label, .ui-field-contain > .ui-rangeslider > label {
+    float: left;
+    margin: 0.5em 2% 0 0;
+    width: 30% !important;
+  }
+
+  .ui-field-contain > label + [class*="ui-"], .ui-field-contain .ui-controlgroup-controls {
+    -moz-box-sizing: border-box;
+    float: left;
+    width: 100% !important;
+  }
+	/******************************/
+	/**  END DETAILS RESPONSIBLE **/
+	/******************************/
+	
+  i {
+    color: brown;
+    font-size: 0.85em;
+  }
+
+  .myspan {
+    color: green;
+    font-size: 0.85em;
+  }
+
+  .titleSpan {
+    font-size: 1em;
+  }
+}
+/** end media query**/
+/********************/
+
+
+/************************/
+/** CSS FOR EVERY PAGE**/
+.ui-btn-active {
+  background: transparent;
+  background-color: #CCCCCC !important;
+}
+
+.li-active {
+  background: gray;
+}
+
+.ui-disabled, .ui-state-disabled, .ui-select .ui-btn.ui-state-disabled {
+  cursor: default !important;
+  opacity: 0.6 !important;
+}
+
+label {
+  color: #111111;
+  text-shadow: none !important;
+}
+
+
+/*** END ***/
+/***********/
+
+/***********************/
+/*** begin  settings ***/
+#settingscontentdiv {
+  border: 1px solid gray;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  -webkit-border-radius: 3%;
+  border-radius: 3%;
+}
+.controlsclass{
+  text-align: right !important;
+}
+#settings {
+  background-color: #D3D3D3;
+}
+#storp {
+	background-color: #D3D3D3;
+}
+.ui-table-columntoggle-btn {
+  /*display: none !important;*/
+}
+/** end settings **/
+/******************/
+
+/*******************************/
+/******** begin details ********/
+#myResult {
+  border: 1px solid #000000;
+	border-radius: 3%;
+  margin: auto !important;
+	background-color: #D3D3D3;
+}
+
+#myResult label {
+  color: gray !important;
+}
+
+.datediv {
+  clear: both;
+  display: block;
+  overflow: visible;
+  padding: 0.8em 0;
+  position: relative;
+  width: 9em !important;
+}
+
+#myResult textarea {
+  width: 75% !important;
+  height: 75px !important;
+}
+
+#fieldcontain1 .ui-mobile label, #fieldcontain1 .ui-controlgroup-label {
+  margin: auto !important;
+}
+
+#details input:focus, #details select:focus {
+  border: none !important;
+}
+
+.ok {
+  color: green!important;
+}
+
+.no {
+  color: red!important;
+}
+/*** end details ***/
+/*******************/
+
+/*******************************/
+/********* begin index *********/
+
+#index .ui-content {
+  padding: 0.5em !important;
+}
+
+.ui-listview-filter .ui-input-search {
+  margin: 10px 5px 5px !important;
+}
+/**** END INDEX ****/
+/*******************/
+.ui-disabled {
+  border: 1px solid;
+  z-index: 1;
+}
+
+.ui-popup {
+  padding: 4px !important;
+  position: relative !important;
+}
+
+.ui-field-contain, .ui-mobile fieldset.ui-field-contain {
+  border-bottom-width: 0!important;
+  margin: 0!important;
+  padding: 0!important;
+}
+
+#projectpopup {
+  background-color: gray;
+  max-width: 160px;
+}
+
+#statepopup {
+  background-color: gray;
+  max-width: 160px;
+}
+ /**project page***/
+.ui-collapsible-content {
+  background-image: none;
+  border-top-width: 0;
+  padding: 0;
+}
+ 
+ /**** to fix transition issue ****/
+body, .ui-page {
+  -webkit-backface-visibility: hidden;
+}
+
+a { text-decoration: none; }
+
+

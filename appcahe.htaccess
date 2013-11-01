@@ -1,0 +1,9 @@
+AddType text/cache-manifest .appcache
+ExpiresActive On
+ExpiresDefault  "access plus 2 minutes"
+
+# images, CSS and JavaScript
+ExpiresByType image/png "access plus 1 month”
+ExpiresByType text/css "access plus 1 month”
+ExpiresByType application/javascript "access plus 1 minutes"
+ExpiresByType text/javascript "access plus 1 minutes"

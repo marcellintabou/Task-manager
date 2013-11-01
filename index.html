@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html manifest="manifest.appcache">
+  <head>
+    <meta charset='utf-8'>
+    <link rel="shortcut icon" href="favicon.png" type="image/png"/>
+    <link rel="apple-touch-icon-precomposed" href="js/lib/jquerymobile/images/home.png"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="green"/>
+    <meta name='viewport' content="width=device-width, initial-scale=1">
+    <!-- social metatag, facebook open graph -->
+    <meta property="og:title" content="Sample javascript based web mobile application, using HTML5, CSS3, jQuery and jQuery mobile"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:description" content="The Task Manager is a web mobile
+    applicaion based on HTML5, CSS3, Javascript, Jquery, Jquery Mobile, Grunt,
+    Requirejs and many other plugins, no servers side language like php, java
+    and so on... is needed. Data are fetch and retrieved by a more powerfull 
+    API named JIO. busness rules are now implemented by the client layer, data
+    can be store either on localstorage for the browser or on remote storage 
+    like S3, Webdav, xwiki, dropbox and so on. The librairy named jIO provide
+    methods(get, post, put, allDocs) for manipulating data. The application is
+    integrating webapp, enabling offline support. At runtime, all files are 
+    downloaded into the user's device (browser cache), witch make the application
+    faster the new time. It can run on laptop, tablets, smartphone and all devices
+    having a web browser regardless of the OS."/>
+    <meta property="og:image" content="js/lib/jquerymobile/images/home.png"/>
+    <meta property="og:image:type" content="image/png" /> 
+    <meta property="og:image:width" content="48" /> 
+    <meta property="og:image:height" content="48" />
+    <meta property="og:url" content="http://task-manager.site44.com/"/>
+    <meta property="og:site_name" content="Task Manager"/>
+    <meta property="fb:admins" content=""/>
+    
+    <title>Home</title>
+    <script data-main='js/main' src='js/lib/requirejs/require.js'></script>
+  </head>
+  <body>
+    <div data-role='page' id='index' data-theme='a'>
+       <!-- header-->
+      <div data-role='header' data-mini='true' data-position='fixed' data-theme='b' data-inset='true'>
+        <select name='sortby' id='sortby' data-mini='true'>
+          <option value='#'>sort by</option>
+          <option value='title'>Title</option>
+          <option value='begindate'>Begin date</option>
+          <option value='enddate'>End date</option>
+          <option value='state'>State</option>
+        </select>
+        <H2>Task manager</H2>
+        <a href='details.html' class='newtaskbutton ui-btn-right' data-icon='plus'>New task</a>
+      </div>
+      <!-- content-->
+      <div data-role='content' data-theme='a'>
+        <ol data-role='listview' class='content-listview' data-filter='true' data-inset='true' data-filter-placeholder='filter by title, state, date, project'></ol>
+      </div>
+      <!-- footer -->
+      <div data-role='footer' class='footercontent' data-mini='true' data-position='fixed' data-theme='b'>
+        <div data-role='controlgroup' data-type='horizontal' data-mini='true'>
+          <a href='project.html' data-role='button' class='projectbutton' data-icon='arrow-l'>Projects</a>
+          <a href='#' class='tasklistbutton ui-btn-active' data-icon='arrow-u' data-role='button' >Tasks</a>
+          <a href='settings.html' data-role='button' class='settingsbutton' data-icon='gear'>Settings</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+

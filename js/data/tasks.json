@@ -1,0 +1,40 @@
+﻿{
+  "view": "normal",
+  "projects":    [
+        {"_id": "PR-1", "project": "Default"}
+      ],
+  "states":    [
+        { "_id": "ST-1", "state": "Started"},
+        {"_id": "ST-2", "state": "Confirmed"},
+        {"_id": "ST-3", "state": "Completed"}
+      ],
+  "tasks":   [
+        {
+          "_id": "T-0000",
+          "title": "Jquery mobile in action",
+          "project": "Default",
+          "begindate": "2013-05-19T22:00:00.000Z",
+          "enddate": "2013-11-01T23:00:00.000Z",
+          "state": "Completed",
+          "description": "some description comming soon..."
+        },
+        {
+          "_id": "T-0001",
+          "title": "HTML5 and CSS3 overview",
+          "project": "Default",
+          "begindate": "2013-01-14T23:00:00.000Z",
+          "enddate": "2014-10-29T23:00:00.000Z",
+          "state": "Started",
+          "description": "task manager app with JQM"
+        },
+        {
+          "_id": "T-0002",
+          "title": "Other staffs",
+          "project": "Default",
+          "begindate": "2013-05-14T23:00:00.000Z",
+          "enddate": "2014-10-29T23:00:00.000Z",
+          "state": "Confirmed",
+          "description": "some description..."
+        }
+      ]
+    }
