@@ -48,7 +48,7 @@
  */
 
 // define([module_name], [dependencies], module);
-(function (dependencies, module) {
+/*(function (dependencies, module) {
   "use strict";
   if (typeof define === 'function' && define.amd) {
     return define(dependencies, module);
@@ -62,7 +62,9 @@
   'exports',
   'jio',
   'complex_queries'
-], function (exports, jIO, complex_queries) {
+], function (exports, jIO, complex_queries) {*/
+
+define(["jio", "complex_queries"], function (jIO, complex_queries) {
   "use strict";
 
   /**
@@ -71,6 +73,7 @@
    * @param  {Object} obj The object
    * @return {Boolean} true if empty, else false
    */
+  var exports = {};
   function objectIsEmpty(obj) {
     var k;
     for (k in obj) {
@@ -671,49 +674,26 @@
   //////////////////////////////////////////////////////////////////////
   // Tools
 
-  function createLocalDescription(username, application_name) {
-    if (typeof username !== 'string') {
-      throw new TypeError("LocalStorage username must be a string");
-    }
-    var description = {
-      "type": "local",
-      "username": username
-    };
-    if (typeof application_name === 'string') {
-      description.application_name = application_name;
-    }
-    return description;
-  }
-
-  function createMemoryDescription(username, application_name) {
-    var description = createLocalDescription(username, application_name);
-    description.mode = "memory";
-    return description;
-  }
-
   /**
    * Tool to help users to create local storage description for JIO
    *
    * @param  {String} username The username
    * @param  {String} [application_name] The application_name
-   * @param  {String} [mode="localStorage"] Use localStorage or memory
    * @return {Object} The storage description
    */
-  function createDescription(username, application_name, mode) {
-    if (mode === undefined || mode.toString() === 'localStorage') {
-      return createLocalDescription(username, application_name);
+  function createDescription(username, application_name) {
+    var description = {
+      "type": "local",
+      "username": username.toString()
+    };
+    if (application_name !== undefined) {
+      description.application_name = application_name.toString();
     }
-    if (mode.toString() === 'memory') {
-      return createMemoryDescription(username, application_name);
-    }
-    throw new TypeError("Unknown LocalStorage '" + mode.toString() + "' mode");
+    return description;
   }
-
   exports.createDescription = createDescription;
-  exports.createLocalDescription = createLocalDescription;
-  exports.createMemoryDescription = createMemoryDescription;
 
-  function clearLocalStorage() {
+  function clear() {
     var k;
     for (k in localStorage) {
       if (localStorage.hasOwnProperty(k)) {
@@ -723,13 +703,13 @@
       }
     }
   }
+  exports.clear = clear;
+  exports.clearLocalStorage = clear;
 
   function clearMemoryStorage() {
     jIO.util.dictClear(ram);
   }
-
-  exports.clear = clearLocalStorage;
-  exports.clearLocalStorage = clearLocalStorage;
   exports.clearMemoryStorage = clearMemoryStorage;
-
-}));
+  return exports;
+});
+//}));

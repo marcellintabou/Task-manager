@@ -1,20 +1,26 @@
-(function (dependencies, module) {
+/*(function (dependencies, module) {
   "use strict";
+
+  //console.log(dependencies);
   if (typeof define === 'function' && define.amd) {
     return define(dependencies, module);
   }
   if (typeof exports === 'object') {
-    return module(exports, require('rsvp'), require('sha256'));
+    return module(exports);
   }
   window.jIO = {};
-  module(window.jIO, RSVP, {hex_sha256: hex_sha256});
-}(['exports', 'rsvp', 'sha256'], function (exports, RSVP, sha256) {
+	
+  module(window.jIO, {hex_sha256: hex_sha256});
+}(['exports', 'sha256'], function (exports, sha256) {*/
+
+define(["sha256"], function (sha256) {
   "use strict";
 
-  var hex_sha256 = sha256.hex_sha256;
+  var exports = {};
+  var hex_sha256 = window.hex_sha256;
 
-/*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true */
-/*global uniqueJSONStringify, methodType */
+  /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true */
+  /*global uniqueJSONStringify, methodType */
 
 var defaults = {}, constants = {};
 
@@ -52,7 +58,6 @@ constants.http_status_text = {
   "201": "Created",
   "204": "No Content",
   "205": "Reset Content",
-  "206": "Partial Content",
   "400": "Bad Request",
   "401": "Unauthorized",
   "402": "Payment Required",
@@ -84,7 +89,6 @@ constants.http_status_text = {
   "Created": "Created",
   "No Content": "No Content",
   "Reset Content": "Reset Content",
-  "Partial Content": "Partial Content",
   "Bad Request": "Bad Request",
   "Unauthorized": "Unauthorized",
   "Payment Required": "Payment Required",
@@ -116,7 +120,6 @@ constants.http_status_text = {
   "created": "Created",
   "no_content": "No Content",
   "reset_content": "Reset Content",
-  "partial_content": "Partial Content",
   "bad_request": "Bad Request",
   "unauthorized": "Unauthorized",
   "payment_required": "Payment Required",
@@ -160,7 +163,6 @@ constants.http_status = {
   "201": 201,
   "204": 204,
   "205": 205,
-  "206": 206,
   "400": 400,
   "401": 401,
   "402": 402,
@@ -192,7 +194,6 @@ constants.http_status = {
   "Created": 201,
   "No Content": 204,
   "Reset Content": 205,
-  "Partial Content": 206,
   "Bad Request": 400,
   "Unauthorized": 401,
   "Payment Required": 402,
@@ -224,7 +225,6 @@ constants.http_status = {
   "created": 201,
   "no_content": 204,
   "reset_content": 205,
-  "partial_content": 206,
   "bad_request": 400,
   "unauthorized": 401,
   "payment_required": 402,
@@ -268,7 +268,6 @@ constants.http_action = {
   "201": "success",
   "204": "success",
   "205": "success",
-  "206": "success",
   "400": "error",
   "401": "error",
   "402": "error",
@@ -300,7 +299,6 @@ constants.http_action = {
   "Created": "success",
   "No Content": "success",
   "Reset Content": "success",
-  "Partial Content": "success",
   "Bad Request": "error",
   "Unauthorized": "error",
   "Payment Required": "error",
@@ -332,7 +330,6 @@ constants.http_action = {
   "created": "success",
   "no_content": "success",
   "reset_content": "success",
-  "partial_content": "success",
   "bad_request": "error",
   "unauthorized": "error",
   "payment_required": "error",
@@ -403,23 +400,6 @@ defaults.job_rule_conditions = {};
   }
 
   /**
-   * Compare two jobs and test if they use metadata only
-   *
-   * @param  {Object} a The first job to compare
-   * @param  {Object} b The second job to compare
-   * @return {Boolean} True if equal, else false
-   */
-  function useMetadataOnly(a, b) {
-    if (['post', 'put', 'get', 'remove', 'allDocs'].indexOf(a.method) === -1) {
-      return false;
-    }
-    if (['post', 'put', 'get', 'remove', 'allDocs'].indexOf(b.method) === -1) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Compare two jobs and test if they are readers
    *
    * @param  {Object} a The first job to compare
@@ -454,23 +434,6 @@ defaults.job_rule_conditions = {};
   }
 
   /**
-   * Test if the jobs have a document id.
-   *
-   * @param  {Object} a The first job to test
-   * @param  {Object} b The second job to test
-   * @return {Boolean} True if ids exist, else false
-   */
-  function haveDocumentIds(a, b) {
-    if (typeof a.kwargs._id !== "string" || a.kwargs._id === "") {
-      return false;
-    }
-    if (typeof b.kwargs._id !== "string" || b.kwargs._id === "") {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Compare two jobs and test if their kwargs are equal
    *
    * @param  {Object} a The first job to compare
@@ -498,18 +461,16 @@ defaults.job_rule_conditions = {};
     "sameStorageDescription": sameStorageDescription,
     "areWriters": areWriters,
     "areReaders": areReaders,
-    "useMetadataOnly": useMetadataOnly,
     "sameMethod": sameMethod,
     "sameDocumentId": sameDocumentId,
     "sameParameters": sameParameters,
-    "sameOptions": sameOptions,
-    "haveDocumentIds": haveDocumentIds
+    "sameOptions": sameOptions
   };
 
 }());
 
 /*jslint indent: 2, maxlen: 80, nomen: true, sloppy: true */
-/*global exports, Blob, FileReader, RSVP, hex_sha256, XMLHttpRequest,
+/*global exports, Blob, FileReader, Deferred, hex_sha256, XMLHttpRequest,
   constants */
 
 /**
@@ -820,41 +781,32 @@ function makeBinaryStringDigest(string) {
 exports.util.makeBinaryStringDigest = makeBinaryStringDigest;
 
 function readBlobAsBinaryString(blob) {
-  var fr = new FileReader();
-  return new RSVP.Promise(function (resolve, reject, notify) {
-    fr.addEventListener("load", resolve);
-    fr.addEventListener("error", reject);
-    fr.addEventListener("progress", notify);
-    fr.readAsBinaryString(blob);
-  }, function () {
-    fr.abort();
-  });
+  var deferred = new Deferred(), fr = new FileReader();
+  fr.onload = deferred.resolve.bind(deferred);
+  fr.onerror = deferred.reject.bind(deferred);
+  fr.onprogress = deferred.notify.bind(deferred);
+  fr.readAsBinaryString(blob);
+  return deferred.promise();
 }
 exports.util.readBlobAsBinaryString = readBlobAsBinaryString;
 
 function readBlobAsArrayBuffer(blob) {
-  var fr = new FileReader();
-  return new RSVP.Promise(function (resolve, reject, notify) {
-    fr.addEventListener("load", resolve);
-    fr.addEventListener("error", reject);
-    fr.addEventListener("progress", notify);
-    fr.readAsArrayBuffer(blob);
-  }, function () {
-    fr.abort();
-  });
+  var deferred = new Deferred(), fr = new FileReader();
+  fr.onload = deferred.resolve.bind(deferred);
+  fr.onerror = deferred.reject.bind(deferred);
+  fr.onprogress = deferred.notify.bind(deferred);
+  fr.readAsArrayBuffer(blob);
+  return deferred.promise();
 }
 exports.util.readBlobAsArrayBuffer = readBlobAsArrayBuffer;
 
 function readBlobAsText(blob) {
-  var fr = new FileReader();
-  return new RSVP.Promise(function (resolve, reject, notify) {
-    fr.addEventListener("load", resolve);
-    fr.addEventListener("error", reject);
-    fr.addEventListener("progress", notify);
-    fr.readAsText(blob);
-  }, function () {
-    fr.abort();
-  });
+  var deferred = new Deferred(), fr = new FileReader();
+  fr.onload = deferred.resolve.bind(deferred);
+  fr.onerror = deferred.reject.bind(deferred);
+  fr.onprogress = deferred.notify.bind(deferred);
+  fr.readAsText(blob);
+  return deferred.promise();
 }
 exports.util.readBlobAsText = readBlobAsText;
 
@@ -874,33 +826,29 @@ exports.util.readBlobAsText = readBlobAsText;
  * @return {Promise} The promise
  */
 function ajax(param) {
-  var xhr = new XMLHttpRequest();
-  return new RSVP.Promise(function (resolve, reject, notify) {
-    var k;
-    xhr.open(param.type || "GET", param.url, true);
-    xhr.responseType = param.dataType || "";
-    if (typeof param.headers === 'object' && param.headers !== null) {
-      for (k in param.headers) {
-        if (param.headers.hasOwnProperty(k)) {
-          xhr.setRequestHeader(k, param.headers[k]);
-        }
+  var k, xhr = new XMLHttpRequest(), deferred = new Deferred();
+  xhr.open(param.type || "GET", param.url, true);
+  xhr.responseType = param.dataType || "";
+  if (typeof param.headers === 'object' && param.headers !== null) {
+    for (k in param.headers) {
+      if (param.headers.hasOwnProperty(k)) {
+        xhr.setRequestHeader(k, param.headers[k]);
       }
     }
-    xhr.addEventListener("load", function (e) {
-      if (e.target.status >= 400) {
-        return reject(e);
-      }
-      resolve(e);
-    });
-    xhr.addEventListener("error", reject);
-    xhr.addEventListener("progress", notify);
-    if (typeof param.beforeSend === 'function') {
-      param.beforeSend(xhr);
+  }
+  xhr.onload = function (e) {
+    if (e.target.status >= 400) {
+      return deferred.reject(e);
     }
-    xhr.send(param.data);
-  }, function () {
-    xhr.abort();
-  });
+    deferred.resolve(e);
+  };
+  xhr.onerror = deferred.reject.bind(deferred);
+  xhr.onprogress = deferred.notify.bind(deferred);
+  if (typeof param.beforeSend === 'function') {
+    param.beforeSend(xhr);
+  }
+  xhr.send(param.data);
+  return deferred.promise();
 }
 exports.util.ajax = ajax;
 
@@ -1184,6 +1132,187 @@ EventEmitter.listenerCount = function (emitter, event) {
 
 exports.EventEmitter = EventEmitter;
 
+/*jslint indent: 2, maxlen: 80, nomen: true, sloppy: true, regexp: true */
+/*global Deferred, inherits, constants, dictUpdate, deepClone, Blob,
+  methodType */
+
+function IODeferred(method, info) {
+  IODeferred.super_.call(this);
+  this._info = info || {};
+  this._method = method;
+  // this._options = options;
+}
+inherits(IODeferred, Deferred);
+
+IODeferred.prototype.resolve = function (a, b) {
+  // resolve('ok', {"custom": "value"});
+  // resolve(200, {...});
+  // resolve({...});
+  var weak = {"result": "success"}, strong = {};
+  if (this._method === 'post') {
+    weak.status = constants.http_status.created;
+    weak.statusText = constants.http_status_text.created;
+  } else if (methodType(this._method) === "writer" ||
+             this._method === "check") {
+    weak.status = constants.http_status.no_content;
+    weak.statusText = constants.http_status_text.no_content;
+  } else {
+    weak.status = constants.http_status.ok;
+    weak.statusText = constants.http_status_text.ok;
+  }
+  if (this._info._id) {
+    weak.id = this._info._id;
+  }
+  if (/Attachment$/.test(this._method)) {
+    weak.attachment = this._info._attachment;
+  }
+  weak.method = this._method;
+
+  if (typeof a === 'string' || (typeof a === 'number' && isFinite(a))) {
+    strong.status = constants.http_status[a];
+    strong.statusText = constants.http_status_text[a];
+    if (strong.status === undefined ||
+        strong.statusText === undefined) {
+      return this.reject(
+        'internal_storage_error',
+        'invalid response',
+        'Unknown status "' + a + '"'
+      );
+    }
+    a = b;
+  }
+  if (typeof a === 'object' && !Array.isArray(a)) {
+    dictUpdate(weak, a);
+  }
+  dictUpdate(weak, strong);
+  strong = undefined; // free memory
+  if (this._method === 'post' && (typeof weak.id !== 'string' || !weak.id)) {
+    return this.reject(
+      'internal_storage_error',
+      'invalid response',
+      'New document id have to be specified'
+    );
+  }
+  if (this._method === 'getAttachment') {
+    if (typeof weak.data === 'string') {
+      weak.data = new Blob([weak.data], {
+        "type": weak.content_type || weak.mimetype || ""
+      });
+      delete weak.content_type;
+      delete weak.mimetype;
+    }
+    if (!(weak.data instanceof Blob)) {
+      return this.reject(
+        'internal_storage_error',
+        'invalid response',
+        'getAttachment method needs a Blob as returned "data".'
+      );
+    }
+  } else if (methodType(this._method) === 'reader' &&
+             this._method !== 'check' &&
+             (typeof weak.data !== 'object' ||
+              Object.getPrototypeOf(weak.data) !== Object.prototype)) {
+    return this.reject(
+      'internal_storage_error',
+      'invalid response',
+      this._method + ' method needs a dict as returned "data".'
+    );
+  }
+  //return super_resolve(deepClone(weak));
+  return IODeferred.super_.prototype.resolve.call(this, deepClone(weak));
+};
+
+IODeferred.prototype.reject = function (a, b, c, d) {
+  // reject(status, reason, message, {"custom": "value"});
+  // reject(status, reason, {..});
+  // reject(status, {..});
+  var weak = {"result": "error"}, strong = {};
+  weak.status = constants.http_status.unknown;
+  weak.statusText = constants.http_status_text.unknown;
+  weak.message = 'Command failed';
+  weak.reason = 'fail';
+  weak.method = this._method;
+  if (this._info._id) {
+    weak.id = this._info._id;
+  }
+  if (/Attachment$/.test(this._method)) {
+    weak.attachment = this._info._attachment;
+  }
+
+  if (typeof a !== 'object' || Array.isArray(a)) {
+    strong.status = constants.http_status[a];
+    strong.statusText = constants.http_status_text[a];
+    if (strong.status === undefined ||
+        strong.statusText === undefined) {
+      return this.reject(
+        // can create infernal loop if 'internal_storage_error' is not defined
+        // in the constants
+        'internal_storage_error',
+        'invalid response',
+        'Unknown status "' + a + '"'
+      );
+    }
+    a = b;
+    b = c;
+    c = d;
+  }
+
+  if (typeof a !== 'object' || Array.isArray(a)) {
+    strong.reason = a;
+    a = b;
+    b = c;
+  }
+
+  if (typeof a !== 'object' || Array.isArray(a)) {
+    strong.message = a;
+    a = b;
+  }
+
+  if (typeof a === 'object' && !Array.isArray(a)) {
+    dictUpdate(weak, a);
+  }
+
+  dictUpdate(weak, strong);
+  strong = undefined;
+  if (weak.error === undefined) {
+    weak.error = weak.statusText.toLowerCase().replace(/ /g, '_').
+      replace(/[^_a-z]/g, '');
+  }
+  if (typeof weak.message !== 'string') {
+    weak.message = "";
+  }
+  if (typeof weak.reason !== 'string') {
+    weak.reason = "unknown";
+  }
+  //return super_reject(deepClone(weak));
+  return IODeferred.super_.prototype.reject.call(this, deepClone(weak));
+};
+
+IODeferred.createFromDeferred = function (method, info, options, deferred) {
+  var iodeferred = new IODeferred(method, info, options);
+  // iodeferred.promise().done(deferred.resolve.bind(deferred)).
+  //   fail(deferred.reject.bind(deferred)).
+  //   progress(deferred.notify.bind(deferred));
+  // // phantomjs doesn't like 'bind'...
+  iodeferred.promise().done(function () {
+    deferred.resolve.apply(deferred, arguments);
+  }).fail(function () {
+    deferred.reject.apply(deferred, arguments);
+  }).progress(function () {
+    deferred.notify.apply(deferred, arguments);
+  });
+  return iodeferred;
+};
+
+IODeferred.createFromParam = function (param) {
+  return IODeferred.createFromDeferred(
+    param.method,
+    param.kwargs,
+    param.options,
+    param.deferred
+  );
+};
+
 /*jslint indent: 2, maxlen: 80, nomen: true, sloppy: true */
 /*global EventEmitter, deepClone, inherits, exports */
 /*global enableRestAPI, enableRestParamChecker, enableJobMaker, enableJobRetry,
@@ -1207,10 +1336,10 @@ function JIO(storage_spec, options) {
   enableJobMaker(this, shared, options);
   enableJobReference(this, shared, options);
   enableJobRetry(this, shared, options);
-  enableJobTimeout(this, shared, options);
   enableJobChecker(this, shared, options);
   enableJobQueue(this, shared, options);
   enableJobRecovery(this, shared, options);
+  enableJobTimeout(this, shared, options);
   enableJobExecuter(this, shared, options);
 
   shared.emit('load');
@@ -1631,8 +1760,8 @@ LocalStorageArray.saveArray = function (namespace, list) {
  */
 function Metadata(metadata) {
   if (arguments.length > 0) {
-    if (metadata === null || typeof metadata !== 'object' ||
-        Array.isArray(metadata)) {
+    if (typeof metadata !== 'object' ||
+        Object.getPrototypeOf(metadata || []) !== Object.prototype) {
       throw new TypeError("Metadata(): Optional argument 1 is not an object");
     }
     this._dict = metadata;
@@ -1936,6 +2065,782 @@ Metadata.checkValue = function (value) {
 exports.Metadata = Metadata;
 
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true */
+/*global Deferred, exports, setInterval, setTimeout, clearInterval,
+  clearTimeout */
+
+/**
+ * Promise()
+ *
+ * @class Promise
+ * @constructor
+ */
+function Promise() {
+  this._onReject = [];
+  this._onResolve = [];
+  this._onProgress = [];
+  this._state = "";
+  this._answers = undefined;
+}
+
+////////////////////////////////////////////////////////////
+// http://wiki.commonjs.org/wiki/Promises/B
+// when(value, callback, errback_opt)
+
+/**
+ * when(item, [onSuccess], [onError], [onProgress]): Promise
+ *
+ * Return an item as first parameter of the promise answer. If item is of
+ * type Promise, the method will just return the promise. If item is of type
+ * Deferred, the method will return the deferred promise.
+ *
+ *     Promise.when('a').then(console.log); // shows 'a'
+ *
+ * @method when
+ * @static
+ * @param  {Any} item The item to use
+ * @param  {Function} [onSuccess] The callback called on success
+ * @param  {Function} [onError] the callback called on error
+ * @param  {Function} [onProgress] the callback called on progress
+ * @return {Promise} The promise
+ */
+Promise.when = function (item, onSuccess, onError, onProgress) {
+  if (item instanceof Promise) {
+    return item.done(onSuccess).fail(onError).progress(onProgress);
+  }
+  if (typeof Deferred === 'function' && item instanceof Deferred) {
+    return item.promise().done(onSuccess).fail(onError).progress(onProgress);
+  }
+  var p = new Promise().done(onSuccess).fail(onError).progress(onProgress);
+  p.defer().resolve(item);
+  return p;
+};
+
+/**
+ * error(item, [onError]): Promise
+ *
+ * Return an item as first parameter of the promise answer. The method returns a
+ * rejected promise.
+ *
+ *     Promise.error('a').then(null, console.log); // shows 'a'
+ *     Promise.error(Promise.when('a')).then(null, console.log); // shows 'a'
+ *
+ * @method error
+ * @static
+ * @param  {Any} item The item to use
+ * @param  {Function} [onError] the callback called on error
+ * @return {Promise} The promise
+ */
+Promise.error = function (item, onError) {
+  var p = new Promise().fail(onError), solver = p.defer();
+  Promise.when(
+    item,
+    solver.reject.bind(solver),
+    solver.reject.bind(solver),
+    solver.notify.bind(solver)
+  );
+  return p;
+};
+
+/**
+ * success(item, [onSuccess]): Promise
+ *
+ * Return an item as first parameter of the promise answer. The method returns a
+ * resolved promise.
+ *
+ *     Promise.success(errorPromise).then(console.log); // shows 'Error'
+ *     Promise.success(Promise.error('a')).then(console.log); // shows 'a'
+ *
+ * @method success
+ * @static
+ * @param  {Any} item The item to use
+ * @param  {Function} [onSuccess] the callback called on success
+ * @return {Promise} The promise
+ */
+Promise.success = function (item, onSuccess) {
+  var p = new Promise().done(onSuccess), solver = p.defer();
+  Promise.when(
+    item,
+    solver.resolve.bind(solver),
+    solver.resolve.bind(solver),
+    solver.notify.bind(solver)
+  );
+  return p;
+};
+
+////////////////////////////////////////////////////////////
+// http://wiki.commonjs.org/wiki/Promises/B
+// get(object, name)
+
+/**
+ * get(dict, property): Promise
+ *
+ * Return the dict property as first parameter of the promise answer.
+ *
+ *     Promise.get({'a': 'b'}, 'a').then(console.log); // shows 'b'
+ *
+ * @method get
+ * @static
+ * @param  {Object} dict The object to use
+ * @param  {String} property The object property name
+ * @return {Promise} The promise
+ */
+Promise.get = function (dict, property) {
+  var p = new Promise(), solver = p.defer();
+  try {
+    solver.resolve(dict[property]);
+  } catch (e) {
+    solver.reject(e);
+  }
+  return p;
+};
+
+////////////////////////////////////////////////////////////
+// http://wiki.commonjs.org/wiki/Promises/B
+// put(object, name, value)
+
+/**
+ * put(dict, property, value): Promise
+ *
+ * Set and return the dict property as first parameter of the promise answer.
+ *
+ *     Promise.put({'a': 'b'}, 'a', 'c').then(console.log); // shows 'c'
+ *
+ * @method put
+ * @static
+ * @param  {Object} dict The object to use
+ * @param  {String} property The object property name
+ * @param  {Any} value The value
+ * @return {Promise} The promise
+ */
+Promise.put = function (dict, property, value) {
+  var p = new Promise(), solver = p.defer();
+  try {
+    dict[property] = value;
+    solver.resolve(dict[property]);
+  } catch (e) {
+    solver.reject(e);
+  }
+  return p;
+};
+
+/**
+ * execute(callback): Promise
+ *
+ * Execute the callback and use the returned value as promise answer.
+ *
+ *     Promise.execute(function () {
+ *       return 'a';
+ *     }).then(console.log); // shows 'a'
+ *
+ * @method execute
+ * @static
+ * @param  {Function} callback The callback to execute
+ * @return {Promise} The promise
+ */
+Promise.execute = function (callback) {
+  var p = new Promise(), solver = p.defer();
+  try {
+    Promise.when(callback(), solver.resolve, solver.reject);
+  } catch (e) {
+    solver.reject(e);
+  }
+  return p;
+};
+
+/**
+ * all(items): Promise
+ *
+ * Resolve the promise. The item type must be like the item parameter of the
+ * `when` static method.
+ *
+ *     Promise.all([promisedError, 'b']).
+ *       then(console.log); // shows [Error, 'b']
+ *
+ * @method all
+ * @static
+ * @param  {Array} items The items to use
+ * @return {Promise} The promise
+ */
+Promise.all = function (items) {
+  var array = [], count = 0, next = new Promise(), solver, i;
+  solver = next.defer();
+  function succeed(i) {
+    return function (answer) {
+      array[i] = answer;
+      count += 1;
+      if (count !== items.length) {
+        return;
+      }
+      return solver.resolve(array);
+    };
+  }
+  function notify(i) {
+    return function (answer) {
+      solver.notify(i, answer);
+    };
+  }
+  for (i = 0; i < items.length; i += 1) {
+    Promise.when(items[i], succeed(i), succeed(i), notify(i));
+  }
+  return next;
+};
+
+/**
+ * allOrNone(items): Promise
+ *
+ * Resolve the promise only when all items are resolved. If one item fails, then
+ * reject. The item type must be like the item parameter of the `when` static
+ * method.
+ *
+ *     Promise.allOrNone([Promise.when('a'), 'b']).
+ *       then(console.log); // shows ['a', 'b']
+ *
+ * @method allOrNone
+ * @static
+ * @param  {Array} items The items to use
+ * @return {Promise} The promise
+ */
+Promise.allOrNone = function (items) {
+  var array = [], count = 0, next = new Promise(), solver;
+  solver = next.defer();
+  items.forEach(function (item, i) {
+    Promise.when(item, function (answer) {
+      array[i] = answer;
+      count += 1;
+      if (count !== items.length) {
+        return;
+      }
+      return solver.resolve(array);
+    }, function (answer) {
+      return solver.reject(answer);
+    }, function (answer) {
+      solver.notify(i, answer);
+    });
+  });
+  return next;
+};
+
+/**
+ * any(items): Promise
+ *
+ * Resolve the promise only when one of the items is resolved. The item type
+ * must be like the item parameter of the `when` static method.
+ *
+ *     Promise.any([promisedError, Promise.delay(10)]).
+ *       then(console.log); // shows 10
+ *
+ * @method any
+ * @static
+ * @param  {Array} items The items to use
+ * @return {Promise} The promise
+ */
+Promise.any = function (items) {
+  var count = 0, next = new Promise(), solver, i;
+  solver = next.defer();
+  function onError(answer) {
+    count += 1;
+    if (count === items.length) {
+      solver.reject(answer);
+    }
+  }
+  for (i = 0; i < items.length; i += 1) {
+    Promise.when(items[i], solver.resolve, onError);
+  }
+  return next;
+};
+
+/**
+ * first(items): Promise
+ *
+ * Resolve the promise only when one item is resolved. The item type must be
+ * like the item parameter of the `when` static method.
+ *
+ *     Promise.first([Promise.delay(100), 'b']).then(console.log); // shows 'b'
+ *
+ * @method first
+ * @static
+ * @param  {Array} items The items to use
+ * @return {Promise} The promise
+ */
+Promise.first = function (items) { // *promises
+  var next = new Promise(), solver = next.defer(), i;
+  for (i = 0; i < items.length; i += 1) {
+    Promise.when(items[i], solver.resolve, solver.reject);
+  }
+  return next;
+};
+
+/**
+ * delay(timeout[, every]): Promise
+ *
+ * Resolve the promise after `timeout` milliseconds and notfies us every `every`
+ * milliseconds.
+ *
+ *     Promise.delay(50, 10).then(console.log, console.error, console.log);
+ *     // // shows
+ *     // 10 // from progress
+ *     // 20 // from progress
+ *     // 30 // from progress
+ *     // 40 // from progress
+ *     // 50 // from success
+ *
+ * @method delay
+ * @static
+ * @param  {Number} timeout In milliseconds
+ * @param  {Number} [every] In milliseconds
+ * @return {Promise} The promise
+ */
+Promise.delay = function (timeout, every) {
+  var next = new Promise(), solver, ident, now = 0;
+  solver = next.defer();
+  if (typeof every === 'number' && isFinite(every)) {
+    ident = setInterval(function () {
+      now += every;
+      solver.notify(now);
+    }, every);
+  }
+  setTimeout(function () {
+    clearInterval(ident);
+    solver.resolve(timeout);
+  }, timeout);
+  return next;
+};
+
+/**
+ * timeout(item, timeout): Promise
+ *
+ * If the promise is not resolved after `timeout` milliseconds, it returns a
+ * timeout error.
+ *
+ *     Promise.timeout('a', 100).then(console.log); // shows 'a'
+ *
+ *     Promise.timeout(Promise.delay(100), 10).then(console.log, console.error);
+ *     // shows Error Timeout
+ *
+ * @method timeout
+ * @static
+ * @param  {Any} Item The item to use
+ * @param  {Number} timeout In milliseconds
+ * @return {Promise} The promise
+ */
+Promise.timeout = function (item, timeout) {
+  var next = new Promise(), solver, i;
+  solver = next.defer();
+  i = setTimeout(function () {
+    solver.reject(new Error("Timeout"));
+  }, timeout);
+  Promise.when(item, function () {
+    clearTimeout(i);
+    solver.resolve.apply(solver, arguments);
+  }, function () {
+    clearTimeout(i);
+    solver.reject.apply(solver, arguments);
+  });
+  return next;
+};
+
+/**
+ * defer([callback]): Promise
+ *
+ * Set the promise to the 'running' state. If `callback` is a function, then it
+ * will be executed with a solver as first parameter and returns the promise.
+ * Else it returns the promise solver.
+ *
+ * @method defer
+ * @param  {Function} [callback] The callback to execute
+ * @return {Promise,Object} The promise or the promise solver
+ */
+Promise.prototype.defer = function (callback) {
+  var that = this;
+  switch (this._state) {
+  case "running":
+  case "resolved":
+  case "rejected":
+    throw new Error("Promise().defer(): Already " + this._state);
+  default:
+    break;
+  }
+  function createSolver() {
+    return {
+      "resolve": function () {
+        var array;
+        if (that._state !== "resolved" && that._state !== "rejected") {
+          that._state = "resolved";
+          that._answers = arguments;
+          array = that._onResolve.slice();
+          setTimeout(function () {
+            var i;
+            for (i = 0; i < array.length; i += 1) {
+              try {
+                array[i].apply(that, that._answers);
+              } catch (ignore) {} // errors will never be retrieved by global
+            }
+          });
+          // free the memory
+          that._onResolve = undefined;
+          that._onReject = undefined;
+          that._onProgress = undefined;
+        }
+      },
+      "reject": function () {
+        var array;
+        if (that._state !== "resolved" && that._state !== "rejected") {
+          that._state = "rejected";
+          that._answers = arguments;
+          array = that._onReject.slice();
+          setTimeout(function () {
+            var i;
+            for (i = 0; i < array.length; i += 1) {
+              try {
+                array[i].apply(that, that._answers);
+              } catch (ignore) {} // errors will never be retrieved by global
+            }
+          });
+          // free the memory
+          that._onResolve = undefined;
+          that._onReject = undefined;
+          that._onProgress = undefined;
+        }
+      },
+      "notify": function () {
+        if (that._onProgress) {
+          var i;
+          for (i = 0; i < that._onProgress.length; i += 1) {
+            try {
+              that._onProgress[i].apply(that, arguments);
+            } catch (ignore) {} // errors will never be retrieved by global
+          }
+        }
+      }
+    };
+  }
+  this._state = "running";
+  if (typeof callback === 'function') {
+    callback(createSolver());
+    return this;
+  }
+  return createSolver();
+};
+
+////////////////////////////////////////////////////////////
+// http://wiki.commonjs.org/wiki/Promises/A
+// then(fulfilledHandler, errorHandler, progressHandler)
+
+/**
+ * then([onSuccess], [onError], [onProgress]): Promise
+ *
+ * Returns a new Promise with the return value of the `onSuccess` or `onError`
+ * callback as first parameter. If the pervious promise is resolved, the
+ * `onSuccess` callback is called. If rejected, the `onError` callback is
+ * called. If notified, `onProgress` is called.
+ *
+ *     Promise.when(1).
+ *       then(function (one) { return one + 1; }).
+ *       then(console.log); // shows 2
+ *
+ * @method then
+ * @param  {Function} [onSuccess] The callback to call on resolve
+ * @param  {Function} [onError] The callback to call on reject
+ * @param  {Function} [onProgress] The callback to call on notify
+ * @return {Promise} The new promise
+ */
+Promise.prototype.then = function (onSuccess, onError, onProgress) {
+  var next = new Promise(), that = this, resolver = next.defer();
+  switch (this._state) {
+  case "resolved":
+    if (typeof onSuccess === 'function') {
+      setTimeout(function () {
+        try {
+          Promise.when(
+            onSuccess.apply(that, that._answers),
+            resolver.resolve,
+            resolver.reject
+          );
+        } catch (e) {
+          resolver.reject(e);
+        }
+      });
+    } else {
+      setTimeout(function () {
+        resolver.resolve.apply(resolver, that._answers);
+      });
+    }
+    break;
+  case "rejected":
+    if (typeof onError === 'function') {
+      setTimeout(function () {
+        var result = onError.apply(that, that._answers);
+        if (result === undefined) {
+          return resolver.reject.apply(resolver, that._answers);
+        }
+        try {
+          Promise.when(
+            result,
+            resolver.reject,
+            resolver.reject
+          );
+        } catch (e) {
+          resolver.reject(e);
+        }
+      });
+    } else {
+      setTimeout(function () {
+        resolver.reject.apply(resolver, that._answers);
+      });
+    }
+    break;
+  default:
+    if (typeof onSuccess === 'function') {
+      this._onResolve.push(function () {
+        try {
+          Promise.when(
+            onSuccess.apply(that, arguments),
+            resolver.resolve,
+            resolver.reject,
+            resolver.notify
+          );
+        } catch (e) {
+          resolver.reject(e);
+        }
+      });
+    } else {
+      this._onResolve.push(function () {
+        resolver.resolve.apply(resolver, arguments);
+      });
+    }
+    if (typeof onError === 'function') {
+      this._onReject.push(function () {
+        try {
+          Promise.when(
+            onError.apply(that, that._answers),
+            resolver.reject,
+            resolver.reject
+          );
+        } catch (e) {
+          resolver.reject(e);
+        }
+      });
+    } else {
+      this._onReject.push(function () {
+        resolver.reject.apply(resolver, that._answers);
+      });
+    }
+    if (typeof onProgress === 'function') {
+      this._onProgress.push(function () {
+        var result;
+        try {
+          result = onProgress.apply(that, arguments);
+          if (result === undefined) {
+            resolver.notify.apply(that, arguments);
+          } else {
+            resolver.notify(result);
+          }
+        } catch (e) {
+          resolver.notify.apply(that, arguments);
+        }
+      });
+    } else {
+      this._onProgress.push(function () {
+        resolver.notify.apply(resolver, arguments);
+      });
+    }
+    break;
+  }
+  return next;
+};
+
+////////////////////////////////////////////////////////////
+// http://wiki.commonjs.org/wiki/Promises/A
+// get(propertyName)
+
+/**
+ * get(property): Promise
+ *
+ * Get the property of the promise response as first parameter of the new
+ * Promise.
+ *
+ *     Promise.when({'a': 'b'}).get('a').then(console.log); // shows 'b'
+ *
+ * @method get
+ * @param  {String} property The object property name
+ * @return {Promise} The promise
+ */
+Promise.prototype.get = function (property) {
+  return this.then(function (dict) {
+    return dict[property];
+  });
+};
+
+////////////////////////////////////////////////////////////
+// http://wiki.commonjs.org/wiki/Promises/A
+// call(functionName, arg1, arg2, ...)
+Promise.prototype.call = function (function_name) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return this.then(function (dict) {
+    return dict[function_name].apply(dict, args);
+  });
+};
+
+/**
+ * done(callback): Promise
+ *
+ * Call the callback on resolve.
+ *
+ *     Promise.when(1).
+ *       done(function (one) { return one + 1; }).
+ *       done(console.log); // shows 1
+ *
+ * @method done
+ * @param  {Function} callback The callback to call on resolve
+ * @return {Promise} This promise
+ */
+Promise.prototype.done = function (callback) {
+  var that = this;
+  if (typeof callback !== 'function') {
+    return this;
+  }
+  switch (this._state) {
+  case "resolved":
+    setTimeout(function () {
+      try {
+        callback.apply(that, that._answers);
+      } catch (ignore) {} // errors will never be retrieved by global
+    });
+    break;
+  case "rejected":
+    break;
+  default:
+    this._onResolve.push(callback);
+    break;
+  }
+  return this;
+};
+
+/**
+ * fail(callback): Promise
+ *
+ * Call the callback on reject.
+ *
+ *     promisedTypeError().
+ *       fail(function (e) { name_error(); }).
+ *       fail(console.log); // shows TypeError
+ *
+ * @method fail
+ * @param  {Function} callback The callback to call on reject
+ * @return {Promise} This promise
+ */
+Promise.prototype.fail = function (callback) {
+  var that = this;
+  if (typeof callback !== 'function') {
+    return this;
+  }
+  switch (this._state) {
+  case "rejected":
+    setTimeout(function () {
+      try {
+        callback.apply(that, that._answers);
+      } catch (ignore) {} // errors will never be retrieved by global
+    });
+    break;
+  case "resolved":
+    break;
+  default:
+    this._onReject.push(callback);
+    break;
+  }
+  return this;
+};
+
+/**
+ * progress(callback): Promise
+ *
+ * Call the callback on notify.
+ *
+ *     Promise.delay(100, 10).
+ *       progress(function () { return null; }).
+ *       progress(console.log); // does not show null
+ *
+ * @method progress
+ * @param  {Function} callback The callback to call on notify
+ * @return {Promise} This promise
+ */
+Promise.prototype.progress = function (callback) {
+  if (typeof callback !== 'function') {
+    return this;
+  }
+  switch (this._state) {
+  case "rejected":
+  case "resolved":
+    break;
+  default:
+    this._onProgress.push(callback);
+    break;
+  }
+  return this;
+};
+
+/**
+ * always(callback): Promise
+ *
+ * Call the callback on resolve or on reject.
+ *
+ *     sayHello().
+ *       done(iAnswer).
+ *       fail(iHeardNothing).
+ *       always(iKeepWalkingAnyway);
+ *
+ * @method always
+ * @param  {Function} callback The callback to call on resolve or on reject
+ * @return {Promise} This promise
+ */
+Promise.prototype.always = function (callback) {
+  var that = this;
+  if (typeof callback !== 'function') {
+    return this;
+  }
+  switch (this._state) {
+  case "resolved":
+  case "rejected":
+    setTimeout(function () {
+      try {
+        callback.apply(that, that._answers);
+      } catch (ignore) {} // errors will never be retrieved by global
+    });
+    break;
+  default:
+    that._onReject.push(callback);
+    that._onResolve.push(callback);
+    break;
+  }
+  return this;
+};
+
+
+function Deferred() {
+  this._promise = new Promise();
+  this._solver = this._promise.defer();
+}
+
+Deferred.prototype.resolve = function () {
+  this._solver.resolve.apply(this._solver, arguments);
+};
+
+Deferred.prototype.reject = function () {
+  this._solver.reject.apply(this._solver, arguments);
+};
+
+Deferred.prototype.notify = function () {
+  this._solver.notify.apply(this._solver, arguments);
+};
+
+Deferred.prototype.promise = function () {
+  return this._promise;
+};
+
+exports.Promise = Promise;
+exports.Deferred = Deferred;
+
+/*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true */
 /*global */
 
 /**
@@ -2154,163 +3059,8 @@ function addJobRuleCondition(name, method) {
 }
 exports.addJobRuleCondition = addJobRuleCondition;
 
-/*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, regexp: true */
-/*global constants, dictUpdate, deepClone */
-
-function restCommandRejecter(param, args) {
-  // reject(status, reason, message, {"custom": "value"});
-  // reject(status, reason, {..});
-  // reject(status, {..});
-  var a = args[0], b = args[1], c = args[2], d = args[3], weak, strong;
-  weak = {"result": "error"};
-  strong = {};
-  weak.status = constants.http_status.unknown;
-  weak.statusText = constants.http_status_text.unknown;
-  weak.message = 'Command failed';
-  weak.reason = 'fail';
-  weak.method = param.method;
-  if (param.kwargs._id) {
-    weak.id = param.kwargs._id;
-  }
-  if (/Attachment$/.test(param.method)) {
-    weak.attachment = param.kwargs._attachment;
-  }
-
-  if (typeof a !== 'object' || Array.isArray(a)) {
-    strong.status = constants.http_status[a];
-    strong.statusText = constants.http_status_text[a];
-    if (strong.status === undefined ||
-        strong.statusText === undefined) {
-      return restCommandRejecter(param, [
-        // can create infernal loop if 'internal_storage_error' is not defined
-        // in the constants
-        'internal_storage_error',
-        'invalid response',
-        'Unknown status "' + a + '"'
-      ]);
-    }
-    a = b;
-    b = c;
-    c = d;
-  }
-
-  if (typeof a !== 'object' || Array.isArray(a)) {
-    strong.reason = a;
-    a = b;
-    b = c;
-  }
-
-  if (typeof a !== 'object' || Array.isArray(a)) {
-    strong.message = a;
-    a = b;
-  }
-
-  if (typeof a === 'object' && !Array.isArray(a)) {
-    dictUpdate(weak, a);
-    if (a instanceof Error) {
-      weak.reason = a.message;
-      weak.error = a.name;
-    }
-  }
-
-  dictUpdate(weak, strong);
-  strong = undefined;
-  if (weak.error === undefined) {
-    weak.error = weak.statusText.toLowerCase().replace(/ /g, '_').
-      replace(/[^_a-z]/g, '');
-  }
-  if (typeof weak.message !== 'string') {
-    weak.message = "";
-  }
-  if (typeof weak.reason !== 'string') {
-    weak.reason = "unknown";
-  }
-  return param.solver.reject(deepClone(weak));
-}
-
-/*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true */
-/*global constants, methodType, dictUpdate, Blob, deepClone,
-  restCommandRejecter */
-
-function restCommandResolver(param, args) {
-  // resolve('ok', {"custom": "value"});
-  // resolve(200, {...});
-  // resolve({...});
-  var a = args[0], b = args[1], weak = {"result": "success"}, strong = {};
-  if (param.method === 'post') {
-    weak.status = constants.http_status.created;
-    weak.statusText = constants.http_status_text.created;
-  } else if (methodType(param.method) === "writer" ||
-             param.method === "check") {
-    weak.status = constants.http_status.no_content;
-    weak.statusText = constants.http_status_text.no_content;
-  } else {
-    weak.status = constants.http_status.ok;
-    weak.statusText = constants.http_status_text.ok;
-  }
-  if (param.kwargs._id) {
-    weak.id = param.kwargs._id;
-  }
-  if (/Attachment$/.test(param.method)) {
-    weak.attachment = param.kwargs._attachment;
-  }
-  weak.method = param.method;
-
-  if (typeof a === 'string' || (typeof a === 'number' && isFinite(a))) {
-    strong.status = constants.http_status[a];
-    strong.statusText = constants.http_status_text[a];
-    if (strong.status === undefined ||
-        strong.statusText === undefined) {
-      return restCommandRejecter(param, [
-        'internal_storage_error',
-        'invalid response',
-        'Unknown status "' + a + '"'
-      ]);
-    }
-    a = b;
-  }
-  if (typeof a === 'object' && !Array.isArray(a)) {
-    dictUpdate(weak, a);
-  }
-  dictUpdate(weak, strong);
-  strong = undefined; // free memory
-  if (param.method === 'post' && (typeof weak.id !== 'string' || !weak.id)) {
-    return restCommandRejecter(param, [
-      'internal_storage_error',
-      'invalid response',
-      'New document id have to be specified'
-    ]);
-  }
-  if (param.method === 'getAttachment') {
-    if (typeof weak.data === 'string') {
-      weak.data = new Blob([weak.data], {
-        "type": weak.content_type || weak.mimetype || ""
-      });
-      delete weak.content_type;
-      delete weak.mimetype;
-    }
-    if (!(weak.data instanceof Blob)) {
-      return restCommandRejecter(param, [
-        'internal_storage_error',
-        'invalid response',
-        'getAttachment method needs a Blob as returned "data".'
-      ]);
-    }
-  } else if (methodType(param.method) === 'reader' &&
-             param.method !== 'check' &&
-             (typeof weak.data !== 'object' ||
-              Object.getPrototypeOf(weak.data) !== Object.prototype)) {
-    return restCommandRejecter(param, [
-      'internal_storage_error',
-      'invalid response',
-      param.method + ' method needs a dict as returned "data".'
-    ]);
-  }
-  return param.solver.resolve(deepClone(weak));
-}
-
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, unparam: true */
-/*global arrayInsert, indexOf, deepClone, defaults, restCommandRejecter */
+/*global arrayInsert, indexOf, deepClone, defaults, IODeferred */
 
 // creates
 // - some defaults job rule actions
@@ -2319,14 +3069,11 @@ function enableJobChecker(jio, shared, options) {
 
   // dependencies
   // - shared.jobs Object Array
-  // - param.promise Object
 
   // creates
   // - shared.job_rules Array
 
-  // uses 'job:new' event
-  // emits 'job:modified', 'job:start', 'job:resolved',
-  // 'job:end', 'job:reject' events
+  // uses 'job' events
 
   var i;
 
@@ -2334,44 +3081,37 @@ function enableJobChecker(jio, shared, options) {
 
   shared.job_rule_actions = {
     wait: function (original_job, new_job) {
-      original_job.promise.always(function () {
-        new_job.state = 'ready';
-        new_job.modified = new Date();
-        shared.emit('job:modified', new_job);
-        shared.emit('job:start', new_job);
+      original_job.deferred.promise().always(function () {
+        shared.emit('job', new_job);
       });
       new_job.state = 'waiting';
       new_job.modified = new Date();
-      shared.emit('job:modified', new_job);
     },
     update: function (original_job, new_job) {
-      if (!new_job.solver) {
+      if (!new_job.deferred) {
         // promise associated to the job
         new_job.state = 'done';
-        shared.emit('job:resolved', new_job, []); // XXX why resolve?
-        shared.emit('job:end', new_job);
+        shared.emit('jobDone', new_job);
       } else {
-        if (!original_job.solver) {
-          original_job.solver = new_job.solver;
+        if (!original_job.deferred) {
+          original_job.deferred = new_job.deferred;
         } else {
-          original_job.promise.then(
-            new_job.command.resolve,
-            new_job.command.reject,
-            new_job.command.notify
-          );
+          original_job.deferred.promise().
+            done(new_job.command.resolve).
+            fail(new_job.command.reject);
         }
       }
       new_job.state = 'running';
       new_job.modified = new Date();
-      shared.emit('job:modified', new_job);
     },
     deny: function (original_job, new_job) {
-      new_job.state = "running";
-      shared.emit('job:reject', new_job, [
+      new_job.state = 'fail';
+      new_job.modified = new Date();
+      IODeferred.createFromParam(new_job).reject(
         'precondition_failed',
         'command denied',
         'Command rejected by the job checker.'
-      ]);
+      );
     }
   };
 
@@ -2489,7 +3229,7 @@ function enableJobChecker(jio, shared, options) {
           }
         } else {
           // browsing jobs
-          for (j = shared.jobs.length - 1; j >= 0; j -= 1) {
+          for (j = 0; j < shared.jobs.length; j += 1) {
             if (shared.jobs[j] !== job) {
               if (
                 jobsRespectConditions(
@@ -2524,13 +3264,11 @@ function enableJobChecker(jio, shared, options) {
       ],
       "action": "update"
     }, {
-      "code_name": "metadata writers update",
+      "code_name": "writers update",
       "conditions": [
         "sameStorageDescription",
         "areWriters",
-        "useMetadataOnly",
         "sameMethod",
-        "haveDocumentIds",
         "sameParameters"
       ],
       "action": "update"
@@ -2539,7 +3277,6 @@ function enableJobChecker(jio, shared, options) {
       "conditions": [
         "sameStorageDescription",
         "areWriters",
-        "haveDocumentIds",
         "sameDocumentId"
       ],
       "action": "wait"
@@ -2555,7 +3292,7 @@ function enableJobChecker(jio, shared, options) {
       }
     }
 
-    shared.on('job:new', checkJob);
+    shared.on('job', checkJob);
 
   }
 
@@ -2566,33 +3303,23 @@ function enableJobChecker(jio, shared, options) {
 }
 
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, unparam: true */
-/*global setTimeout, Job, createStorage, deepClone, min, restCommandResolver,
-  restCommandRejecter */
+/*global setTimeout, Job, createStorage, deepClone, IODeferred, min */
 
 function enableJobExecuter(jio, shared) { // , options) {
 
-  // uses 'job:new' events
-  // uses actions 'job:resolve', 'job:reject' and 'job:notify'
+  // uses 'job', 'jobDone', 'jobFail' and 'jobNotify' events
+  // emits 'jobRun' and 'jobEnd' events
 
-  // emits 'job:modified', 'job:started', 'job:resolved',
-  // 'job:rejected', 'job:notified' and 'job:end' events
-  // emits action 'job:start'
+  // listeners
 
-  function startJobIfReady(job) {
-    if (job.state === 'ready') {
-      shared.emit('job:start', job);
-    }
-  }
-
-  function executeJobIfReady(param) {
+  shared.on('job', function (param) {
     var storage;
     if (param.state === 'ready') {
       param.tried += 1;
       param.started = new Date();
       param.state = 'running';
       param.modified = new Date();
-      shared.emit('job:modified', param);
-      shared.emit('job:started', param);
+      shared.emit('jobRun', param);
       try {
         storage = createStorage(deepClone(param.storage_spec));
       } catch (e) {
@@ -2620,49 +3347,49 @@ function enableJobExecuter(jio, shared) { // , options) {
         );
       });
     }
-  }
+  });
 
-  function endAndResolveIfRunning(job, args) {
-    if (job.state === 'running') {
-      job.state = 'done';
-      job.modified = new Date();
-      shared.emit('job:modified', job);
-      if (job.solver) {
-        restCommandResolver(job, args);
+  shared.on('jobDone', function (param, args) {
+    var d;
+    if (param.state === 'running') {
+      param.state = 'done';
+      param.modified = new Date();
+      shared.emit('jobEnd', param);
+      if (param.deferred) {
+        d = IODeferred.createFromDeferred(
+          param.method,
+          param.kwargs,
+          param.options,
+          param.deferred
+        );
+        d.resolve.apply(d, args);
       }
-      shared.emit('job:resolved', job, args);
-      shared.emit('job:end', job);
     }
-  }
+  });
 
-  function endAndRejectIfRunning(job, args) {
-    if (job.state === 'running') {
-      job.state = 'fail';
-      job.modified = new Date();
-      shared.emit('job:modified', job);
-      if (job.solver) {
-        restCommandRejecter(job, args);
+  shared.on('jobFail', function (param, args) {
+    var d;
+    if (param.state === 'running') {
+      param.state = 'fail';
+      param.modified = new Date();
+      shared.emit('jobEnd', param);
+      if (param.deferred) {
+        d = IODeferred.createFromDeferred(
+          param.method,
+          param.kwargs,
+          param.options,
+          param.deferred
+        );
+        d.reject.apply(d, args);
       }
-      shared.emit('job:rejected', job, args);
-      shared.emit('job:end', job);
     }
-  }
+  });
 
-  function notifyJobIfRunning(job, args) {
-    if (job.state === 'running' && job.solver) {
-      job.solver.notify(args[0]);
-      shared.emit('job:notified', job, args);
+  shared.on('jobNotify', function (param, args) {
+    if (param.state === 'running' && param.deferred) {
+      param.deferred.notify.apply(param.deferred, args);
     }
-  }
-
-  // listeners
-
-  shared.on('job:new', startJobIfReady);
-  shared.on('job:start', executeJobIfReady);
-
-  shared.on('job:resolve', endAndResolveIfRunning);
-  shared.on('job:reject', endAndRejectIfRunning);
-  shared.on('job:notify', notifyJobIfRunning);
+  });
 }
 
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, unparam: true */
@@ -2687,16 +3414,10 @@ function enableJobMaker(jio, shared, options) {
   // - param.options object
   // - param.command object
 
-  // list of job events:
-  // - Job existence -> new, end
-  // - Job execution -> started, stopped
-  // - Job resolution -> resolved, rejected, notified, cancelled
-  // - Job modification -> modified
+  // uses method events
+  // add emits 'job' events
 
-  // emits actions 'job:resolve', 'job:reject' and 'job:notify'
-
-  // uses `rest method` events
-  // emits 'job:new' event
+  // the job can emit 'jobDone', 'jobFail' and 'jobNotify'
 
   shared.job_keys = arrayExtend(shared.job_keys || [], [
     "created",
@@ -2709,56 +3430,55 @@ function enableJobMaker(jio, shared, options) {
     "options"
   ]);
 
-  function addCommandToJob(job) {
-    job.command = {};
-    job.command.resolve = function () {
-      shared.emit('job:resolve', job, arguments);
+  function addCommandToJob(param) {
+    param.command = {};
+    param.command.resolve = function () {
+      shared.emit('jobDone', param, arguments);
     };
-    job.command.success = job.command.resolve;
-    job.command.reject = function () {
-      shared.emit('job:reject', job, arguments);
+    param.command.success = param.command.resolve;
+    param.command.reject = function () {
+      shared.emit('jobFail', param, arguments);
     };
-    job.command.error = job.command.reject;
-    job.command.notify = function () {
-      shared.emit('job:notify', job, arguments);
+    param.command.error = param.command.reject;
+    param.command.notify = function () {
+      shared.emit('jobNotify', param, arguments);
     };
-    job.command.storage = function () {
+    param.command.storage = function () {
       return shared.createRestApi.apply(null, arguments);
     };
-  }
-
-  function createJobFromRest(param) {
-    if (param.solver) {
-      // rest parameters are good
-      shared.emit('job:new', param);
-    }
-  }
-
-  function initJob(job) {
-    job.state = 'ready';
-    if (typeof job.tried !== 'number' || !isFinite(job.tried)) {
-      job.tried = 0;
-    }
-    if (!job.created) {
-      job.created = new Date();
-    }
-    addCommandToJob(job);
-    job.modified = new Date();
   }
 
   // listeners
 
   shared.rest_method_names.forEach(function (method) {
-    shared.on(method, createJobFromRest);
+    shared.on(method, function (param) {
+      if (param.deferred) {
+        // params are good
+        shared.emit('job', param);
+      }
+    });
   });
 
-  shared.on('job:new', initJob);
+  shared.on('job', function (param) {
+    // new or recovered job
+    param.state = 'ready';
+    if (typeof param.tried !== 'number' || !isFinite(param.tried)) {
+      param.tried = 0;
+    }
+    if (!param.created) {
+      param.created = new Date();
+    }
+    if (!param.command) {
+      addCommandToJob(param);
+    }
+    param.modified = new Date();
+  });
 
 }
 
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, unparam: true */
 /*global arrayExtend, localStorage, Workspace, uniqueJSONStringify, JobQueue,
-  constants, indexOf, setTimeout, clearTimeout */
+  constants, indexOf */
 
 function enableJobQueue(jio, shared, options) {
 
@@ -2774,56 +3494,8 @@ function enableJobQueue(jio, shared, options) {
   // - shared.workspace Workspace
   // - shared.job_queue JobQueue
 
-  // uses 'job:new', 'job:started', 'job:stopped', 'job:modified',
-  // 'job:notified', 'job:end' events
-
-  // emits 'job:end' event
-
-  function postJobIfReady(param) {
-    if (!param.stored && param.state === 'ready') {
-      clearTimeout(param.queue_ident);
-      delete param.queue_ident;
-      shared.job_queue.load();
-      shared.job_queue.post(param);
-      shared.job_queue.save();
-      param.stored = true;
-    }
-  }
-
-  function deferredPutJob(param) {
-    if (param.queue_ident === undefined) {
-      param.queue_ident = setTimeout(function () {
-        delete param.queue_ident;
-        if (param.stored) {
-          shared.job_queue.load();
-          shared.job_queue.put(param);
-          shared.job_queue.save();
-        }
-      });
-    }
-  }
-
-  function removeJob(param) {
-    clearTimeout(param.queue_ident);
-    delete param.queue_ident;
-    if (param.stored) {
-      shared.job_queue.load();
-      shared.job_queue.remove(param.id);
-      shared.job_queue.save();
-      delete param.stored;
-      delete param.id;
-    }
-  }
-
-  function initJob(param) {
-    if (!param.command.end) {
-      param.command.end = function () {
-        shared.emit('job:end', param);
-      };
-    }
-  }
-
-  shared.on('job:new', initJob);
+  // uses 'job', 'jobRun', 'jobStop', 'jobEnd' events
+  // emits 'jobEnd' events
 
   if (options.job_management !== false) {
 
@@ -2845,18 +3517,52 @@ function enableJobQueue(jio, shared, options) {
       shared.job_keys
     );
 
-    // Listeners
+    shared.on('job', function (param) {
+      if (indexOf(param.state, ['fail', 'done']) === -1) {
+        if (!param.stored) {
+          shared.job_queue.load();
+          shared.job_queue.post(param);
+          shared.job_queue.save();
+          param.stored = true;
+        }
+      }
+    });
 
-    shared.on('job:new', postJobIfReady);
+    ['jobRun', 'jobStop'].forEach(function (event) {
+      shared.on(event, function (param) {
+        if (param.stored) {
+          shared.job_queue.load();
+          if (param.state === 'done' || param.state === 'fail') {
+            if (shared.job_queue.remove(param.id)) {
+              shared.job_queue.save();
+              delete param.storad;
+            }
+          } else {
+            shared.job_queue.put(param);
+            shared.job_queue.save();
+          }
+        }
+      });
+    });
 
-    shared.on('job:started', deferredPutJob);
-    shared.on('job:stopped', deferredPutJob);
-    shared.on('job:modified', deferredPutJob);
-    shared.on('job:notified', deferredPutJob);
-
-    shared.on('job:end', removeJob);
+    shared.on('jobEnd', function (param) {
+      if (param.stored) {
+        shared.job_queue.load();
+        if (shared.job_queue.remove(param.id)) {
+          shared.job_queue.save();
+        }
+      }
+    });
 
   }
+
+  shared.on('job', function (param) {
+    if (!param.command.end) {
+      param.command.end = function () {
+        shared.emit('jobEnd', param);
+      };
+    }
+  });
 
 }
 
@@ -2871,23 +3577,20 @@ function enableJobRecovery(jio, shared, options) {
   // uses
   // - shared.job_queue JobQueue
 
-  // emits 'job:new' event
-
   function numberOrDefault(number, default_value) {
     return (typeof number === 'number' &&
             isFinite(number) ? number : default_value);
   }
 
   function recoverJob(param) {
-    shared.job_queue.load();
     shared.job_queue.remove(param.id);
     delete param.id;
-    if (methodType(param.method) === 'writer' &&
-        (param.state === 'ready' ||
-         param.state === 'running' ||
-         param.state === 'waiting')) {
+    if (methodType(param.method) === 'writer' ||
+        param.state === 'ready' ||
+        param.state === 'running' ||
+        param.state === 'waiting') {
       shared.job_queue.save();
-      shared.emit('job:new', param);
+      shared.emit('job', param);
     }
   }
 
@@ -2896,7 +3599,7 @@ function enableJobRecovery(jio, shared, options) {
       var job;
       shared.job_queue.load();
       job = shared.job_queue.get(id);
-      if (job && job.modified === modified) {
+      if (job.modified === modified) {
         // job not modified, no one takes care of it
         recoverJob(job);
       }
@@ -2944,17 +3647,17 @@ function enableJobReference(jio, shared, options) {
   // creates
   // - shared.jobs Object Array
 
-  // uses 'job:new' and 'job:end' events
+  // uses 'job', 'jobEnd' events
 
   shared.jobs = [];
 
   var job_references = new ReferenceArray(shared.jobs);
 
-  shared.on('job:new', function (param) {
+  shared.on('job', function (param) {
     job_references.put(param);
   });
 
-  shared.on('job:end', function (param) {
+  shared.on('jobEnd', function (param) {
     job_references.remove(param);
   });
 }
@@ -2988,9 +3691,9 @@ function enableJobRetry(jio, shared, options) {
   // - param.options object
   // - param.command object
 
-  // uses 'job:new' and 'job:retry' events
-  // emits action 'job:start' event
-  // emits 'job:retry', 'job:reject', 'job:modified' and 'job:stopped' events
+  // uses 'job' and 'jobRetry' events
+  // emits 'job', 'jobFail' and 'jobStateChange' events
+  // job can emit 'jobRetry'
 
   shared.job_keys = arrayExtend(shared.job_keys || [], ["max_retry"]);
 
@@ -3034,7 +3737,9 @@ function enableJobRetry(jio, shared, options) {
     2
   );
 
-  function initJob(param) {
+  // listeners
+
+  shared.on('job', function (param) {
     if (typeof param.max_retry !== 'number' || param.max_retry < 0) {
       param.max_retry = positiveNumberOrDefault(
         param.options.max_retry,
@@ -3043,42 +3748,34 @@ function enableJobRetry(jio, shared, options) {
     }
     param.command.reject = function (status) {
       if (constants.http_action[status || 0] === "retry") {
-        shared.emit('job:retry', param, arguments);
+        shared.emit('jobRetry', param, arguments);
       } else {
-        shared.emit('job:reject', param, arguments);
+        shared.emit('jobFail', param, arguments);
       }
     };
     param.command.retry = function () {
-      shared.emit('job:retry', param, arguments);
+      shared.emit('jobRetry', param, arguments);
     };
-  }
+  });
 
-  function retryIfRunning(param, args) {
+  shared.on('jobRetry', function (param, args) {
     if (param.state === 'running') {
       if (param.max_retry === undefined ||
           param.max_retry === null ||
           param.max_retry >= param.tried) {
         param.state = 'waiting';
         param.modified = new Date();
-        shared.emit('job:modified', param);
-        shared.emit('job:stopped', param);
+        shared.emit('jobStop', param);
         setTimeout(function () {
           param.state = 'ready';
           param.modified = new Date();
-          shared.emit('job:modified', param);
-          shared.emit('job:start', param);
+          shared.emit('job', param);
         }, min(10000, param.tried * 2000));
       } else {
-        shared.emit('job:reject', param, args);
+        shared.emit('jobFail', param, args);
       }
     }
-  }
-
-  // listeners
-
-  shared.on('job:new', initJob);
-
-  shared.on('job:retry', retryIfRunning);
+  });
 }
 
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, unparam: true */
@@ -3096,9 +3793,7 @@ function enableJobTimeout(jio, shared, options) {
   // - param.timeout_ident Timeout
   // - param.state string 'running'
 
-  // uses 'job:new', 'job:stopped', 'job:started',
-  // 'job:notified' and 'job:end' events
-  // emits 'job:modified' event
+  // uses 'job', 'jobDone', 'jobFail', 'jobRetry' and 'jobNotify' events
 
   shared.job_keys = arrayExtend(shared.job_keys || [], ["timeout"]);
 
@@ -3123,45 +3818,40 @@ function enableJobTimeout(jio, shared, options) {
     };
   }
 
-  function initJob(job) {
-    if (typeof job.timeout !== 'number' || job.timeout < 0) {
-      job.timeout = positiveNumberOrDefault(
-        job.options.timeout,
+  // listeners
+
+  shared.on('job', function (param) {
+    if (typeof param.timeout !== 'number' || param.timeout < 0) {
+      param.timeout = positiveNumberOrDefault(
+        param.options.timeout,
         default_timeout
       );
     }
-    job.modified = new Date();
-    shared.emit('job:modified', job);
-  }
+    param.modified = new Date();
+  });
 
-  function clearJobTimeout(job) {
-    clearTimeout(job.timeout_ident);
-    delete job.timeout_ident;
-  }
+  ["jobDone", "jobFail", "jobRetry"].forEach(function (event) {
+    shared.on(event, function (param) {
+      clearTimeout(param.timeout_ident);
+      delete param.timeout_ident;
+    });
+  });
 
-  function restartJobTimeoutIfRunning(job) {
-    clearTimeout(job.timeout_ident);
-    if (job.state === 'running' && job.timeout > 0) {
-      job.timeout_ident = setTimeout(timeoutReject(job), job.timeout);
-      job.modified = new Date();
-    } else {
-      delete job.timeout_ident;
-    }
-  }
-
-  // listeners
-
-  shared.on('job:new', initJob);
-
-  shared.on("job:stopped", clearJobTimeout);
-  shared.on("job:end", clearJobTimeout);
-
-  shared.on("job:started", restartJobTimeoutIfRunning);
-  shared.on("job:notified", restartJobTimeoutIfRunning);
+  ["jobRun", "jobNotify", "jobEnd"].forEach(function (event) {
+    shared.on(event, function (param) {
+      clearTimeout(param.timeout_ident);
+      if (param.state === 'running' && param.timeout > 0) {
+        param.timeout_ident = setTimeout(timeoutReject(param), param.timeout);
+        param.modified = new Date();
+      } else {
+        delete param.timeout_ident;
+      }
+    });
+  });
 }
 
 /*jslint indent: 2, maxlen: 80, sloppy: true */
-/*global arrayValuesToTypeDict, dictClear, RSVP, deepClone */
+/*global arrayValuesToTypeDict, dictClear, Deferred, deepClone */
 
 // adds methods to JIO
 // - post
@@ -3180,12 +3870,7 @@ function enableJobTimeout(jio, shared, options) {
 // - method string
 // - kwargs object
 // - options object
-// - solver object
-// - solver.resolve function
-// - solver.reject function
-// - solver.notify function
-// - cancellers object
-// - promise object
+// - command object
 
 function enableRestAPI(jio, shared) { // (jio, shared, options)
 
@@ -3203,7 +3888,7 @@ function enableRestAPI(jio, shared) { // (jio, shared, options)
   ];
 
   function prepareParamAndEmit(method, storage_spec, args) {
-    var callback, type_dict, param = {};
+    var promise, callback, type_dict, param = {};
     type_dict = arrayValuesToTypeDict(Array.prototype.slice.call(args));
     type_dict.object = type_dict.object || [];
     if (method !== 'allDocs') {
@@ -3216,38 +3901,31 @@ function enableRestAPI(jio, shared) { // (jio, shared, options)
     } else {
       param.kwargs = {};
     }
-    param.solver = {};
     param.options = deepClone(type_dict.object.shift()) || {};
-    param.promise = new RSVP.Promise(function (resolve, reject, notify) {
-      param.solver.resolve = resolve;
-      param.solver.reject = reject;
-      param.solver.notify = notify;
-    }, function () {
-      var k;
-      for (k in param.cancellers) {
-        if (param.cancellers.hasOwnProperty(k)) {
-          param.cancellers[k]();
-        }
-      }
-    });
+    //param.deferred = new IODeferred(method, param.kwargs, param.options);
+    param.deferred = new Deferred();
+    promise = param.deferred.promise();
     type_dict['function'] = type_dict['function'] || [];
     if (type_dict['function'].length === 1) {
-      callback = type_dict['function'][0];
-      param.promise.then(function (answer) {
+      callback = type_dict['function'].shift();
+      promise.done(function (answer) {
         callback(undefined, answer);
-      }, function (answer) {
+      });
+      promise.fail(function (answer) {
         callback(answer, undefined);
       });
     } else if (type_dict['function'].length > 1) {
-      param.promise.then(type_dict['function'][0],
-                         type_dict['function'][1],
-                         type_dict['function'][2]);
+      promise.done(type_dict['function'].shift());
+      promise.fail(type_dict['function'].shift());
+      if (type_dict['function'].length === 1) {
+        promise.always(type_dict['function'].shift());
+      }
     }
     type_dict = dictClear(type_dict);
     param.storage_spec = storage_spec;
     param.method = method;
     shared.emit(method, param);
-    return param.promise;
+    return promise;
   }
 
   shared.createRestApi = function (storage_spec, that) {
@@ -3266,12 +3944,12 @@ function enableRestAPI(jio, shared) { // (jio, shared, options)
 }
 
 /*jslint indent: 2, maxlen: 80, sloppy: true, nomen: true, unparam: true */
-/*global Blob, restCommandRejecter, Metadata */
+/*global Blob, IODeferred, Metadata */
 
 function enableRestParamChecker(jio, shared) {
 
   // dependencies
-  // - param.solver
+  // - param.deferred
   // - param.kwargs
 
   // checks the kwargs and convert value if necessary
@@ -3284,12 +3962,12 @@ function enableRestParamChecker(jio, shared) {
 
   function checkId(param) {
     if (typeof param.kwargs._id !== 'string' || param.kwargs._id === '') {
-      restCommandRejecter(param, [
+      IODeferred.createFromParam(param).reject(
         'bad_request',
         'wrong document id',
         'Document id must be a non empty string.'
-      ]);
-      delete param.solver;
+      );
+      delete param.deferred;
       return false;
     }
     return true;
@@ -3298,12 +3976,12 @@ function enableRestParamChecker(jio, shared) {
   function checkAttachmentId(param) {
     if (typeof param.kwargs._attachment !== 'string' ||
         param.kwargs._attachment === '') {
-      restCommandRejecter(param, [
+      IODeferred.createFromParam(param).reject(
         'bad_request',
         'wrong attachment id',
         'Attachment id must be a non empty string.'
-      ]);
-      delete param.solver;
+      );
+      delete param.deferred;
       return false;
     }
     return true;
@@ -3351,15 +4029,15 @@ function enableRestParamChecker(jio, shared) {
       delete param.kwargs._mimetype;
       delete param.kwargs._content_type;
     } else {
-      restCommandRejecter(param, [
+      IODeferred.createFromParam(param).reject(
         'bad_request',
         'wrong attachment',
         'Attachment information must be like {"_id": document id, ' +
           '"_attachment": attachment name, "_data": string, ["_mimetype": ' +
           'content type]} or {"_id": document id, "_attachment": ' +
           'attachment name, "_blob": Blob}'
-      ]);
-      delete param.solver;
+      );
+      delete param.deferred;
     }
   });
 
@@ -3381,6 +4059,7 @@ function enableRestParamChecker(jio, shared) {
     });
   });
 
-}
-
-}));
+  } 
+  return exports;
+});
+//}));

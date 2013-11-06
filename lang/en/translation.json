@@ -1,12 +1,7 @@
-{
+﻿{
     "projects": {
         "header": {
             "h2": "Projects",
-            "translate": {
-                "en": "English",
-                "fr": "French",
-                "ch": "Chinese"
-            },
             "back": "Back"
         },
         "footer": {
@@ -16,5 +11,85 @@
                 "settings": "Settings"
             }
         }
+    },
+    "tasks": {
+        "header": {
+            "h2": "Task manager",
+            "sortby": {
+                "#": "Sort by",
+                "title": "Title",
+                "begindate": "Begin date",
+                "enddate": "End date",
+                "state": "State"
+            },
+            "newtask": "New task"
+        },
+        "content": {
+          "from": "from ",
+          "to": "to ",
+          "placeholder": "filter by title, state, date or project",
+          "empty": "No task found, click on right top button to create a new task"
+        },
+        "footer": {
+            "nav": {
+                "projects": "Projects",
+                "tasks": "Tasks",
+                "settings": "Settings"
+            }
+        }
+    },
+    "settings": {
+        "header": {
+            "h2": "Settings",
+            "home": "Home",
+            "translate": {
+                "en": "English",
+                "fr": "Français",
+                "ch": "中文"
+            }
+        },
+        "content": {
+          "delete": "Delete",
+          "add": "Add",
+          "states": "States",
+          "projects": "Projects",
+          "type": "Type",
+          "username": "Username",
+          "appname": "App name",
+          "switch": "Switch",
+          "columns": "Columns...",
+          "default": "Default",
+          "completed": "Completed",
+          "continued": "Continued",
+          "started": "Started"
+        },
+        "footer": {
+            "nav": {
+                "projects": "Projects",
+                "tasks": "Tasks",
+                "settings": "Settings"
+            }
+        }
+    },
+    "details": {
+      "header": {
+        "back": "Back",
+        "h2": "Details",
+        "home": "Home"
+      },
+      "content": {
+        "title": "Title",
+        "begindate": "Begin date",
+        "enddate": "End date",
+        "project": "Project",
+        "state": "State",
+        "description": "Description",
+        "delete": "Delete",
+        "save": "Save",
+        "selectproject": "--project--",
+        "selectstate": "-- state --",
+        "begindateformat": "Begin(yyyy-mm-dd)",
+        "enddateformat": "End(yyyy-mm-dd)"
+      }
     }
 }

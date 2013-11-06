@@ -10,7 +10,7 @@
  * @module complex_queries
  */
 // define([module_name], [dependencies], module);
-(function (dependencies, module) {
+/*(function (dependencies, module) {
   "use strict";
   if (typeof define === 'function' && define.amd) {
     return define(dependencies, module);
@@ -20,9 +20,12 @@
   }
   window.complex_queries = {};
   module(window.complex_queries);
-}(['exports'], function (to_export) {
+}(['exports'], function (to_export) {*/
+
+define([], function() {
   "use strict";
 
+	var to_export = {};
   /**
    * Add a secured (write permission denied) property to an object.
    *
@@ -1526,7 +1529,7 @@ function select(select_option, list, clone) {
   var i, j, new_item;
   if (!Array.isArray(select_option)) {
     throw new TypeError("complex_queries.select(): " +
-                        "Argument 1 is not of type Array");
+      "Argument 1 is not of type Array");
   }
   if (!Array.isArray(list)) {
     throw new TypeError("complex_queries.select(): " +
@@ -1640,6 +1643,7 @@ function convertStringToRegExp(string, wildcard_character) {
 
 _export('convertStringToRegExp', convertStringToRegExp);
 
-
+//console.log(to_export);
   return to_export;
-}));
+});
+//}));

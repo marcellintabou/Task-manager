@@ -1,7 +1,7 @@
 ﻿{
   "view": "normal",
   "projects":    [
-        {"_id": "PR-1", "project": "Default"}
+        {"_id": "PR-1", "project": "Default", "project_i18n": "settings.content.default"}
       ],
   "states":    [
         { "_id": "ST-1", "state": "Started"},
@@ -10,7 +10,7 @@
       ],
   "tasks":   [
         {
-          "_id": "T-0000",
+          "_id": "T-0",
           "title": "Jquery mobile in action",
           "project": "Default",
           "begindate": "2013-05-19T22:00:00.000Z",
@@ -19,7 +19,7 @@
           "description": "some description comming soon..."
         },
         {
-          "_id": "T-0001",
+          "_id": "T-1",
           "title": "HTML5 and CSS3 overview",
           "project": "Default",
           "begindate": "2013-01-14T23:00:00.000Z",
@@ -28,7 +28,7 @@
           "description": "task manager app with JQM"
         },
         {
-          "_id": "T-0002",
+          "_id": "T-2",
           "title": "Other staffs",
           "project": "Default",
           "begindate": "2013-05-14T23:00:00.000Z",

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html manifest="manifest.appcache">
   <head>
     <meta charset='utf-8'>
@@ -11,8 +11,13 @@
     <div data-role='page' id='settings' data-theme='a'>
       <!-- header -->
       <div data-role='header' data-mini='true' data-inline='true' data-theme='b'>
-          <a href='#index' data-icon='home'>Home</a>
-          <H2>Settings</H2>
+        <a href='#index' data-icon='home' class='t' data-i18n='settings.header.home'>Home</a>
+        <H2 class='t' data-i18n='settings.header.h2'>Settings</H2>
+        <select name='translate' id='translate' data-mini='true' class='ui-btn-right'>
+          <option class='t' data-i18n='settings.header.translate.en' value='en'>English</option>
+          <option class='t' data-i18n='settings.header.translate.fr' value='fr'>Français</option>
+          <option class='t' data-i18n='settings.header.translate.ch' value='ch'>中文</option>
+        </select>
       </div>
       <!-- content -->
       <div data-role='content' data-mini='true' id='settingscontentdiv' data-theme='a'>
@@ -22,9 +27,9 @@
       <!-- footer -->
       <div data-role='footer' data-mini='true' data-position='fixed' data-theme='b'>
         <div data-role='controlgroup' data-type='horizontal'>
-          <a href='project.html' data-role='button' class='projectbutton' data-icon='arrow-l'>Project</a>
-          <a href='#index' class='tasklistbutton ui-btn-active' data-icon='arrow-l' data-role='button' data-direction='reverse'>Task</a>
-          <a href='#' data-role='button' data-icon='gear' class='settingsbutton'>Settings</a>
+          <a href='project.html' data-role='button' class='projectbutton t' data-icon='arrow-l' data-i18n='settings.footer.nav.projects'>Project</a>
+          <a href='#index' class='tasklistbutton ui-btn-active t' data-icon='arrow-l' data-role='button' data-direction='reverse' data-i18n='settings.footer.nav.tasks'>Task</a>
+          <a href='#' data-role='button' data-icon='gear' class='settingsbutton t' data-i18n='settings.footer.nav.settings'>Settings</a>
         </div>
       </div>
     </div>

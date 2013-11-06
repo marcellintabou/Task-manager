@@ -1,8 +1,8 @@
-(function () {
+﻿(function () {
   "use strict";
 
   require.config({
-    waitSeconds: 2,
+    waitSeconds: 3,
     paths: {
       //plugins (require-css, text, json)
       css:             "plugins/requirejs-plugins/require-css/css",
@@ -14,12 +14,12 @@
       jquery:          "lib/jquery/jquery-1.10.1",
       jqm:             "lib/jquerymobile/jquery.mobile-1.4.0pre",
       sha256:          "lib/jio/sha256.amd",
-      rsvp:            "lib/jio/rsvp-custom.amd",
+      //rsvp:            "lib/jio/rsvp-custom.amd",
       jio:             "lib/jio/jio",
       complex_queries: "lib/jio/complex_queries",
       localstorage:    "lib/jio/localstorage",
-      davstorage:      "lib/jio/davstorage",
-      translate:       "modules/translate",
+      //davstorage:      "lib/jio/davstorage",
+     // translate:       "modules/translate",
       overrides:       "modules/overrides"
     },
     shim: {
@@ -34,13 +34,9 @@
       }
     }
   });
-
-  require(
-    ["modules/pmapi", "translate"],
-    function (pmapi, translate) {
-      pmapi.run();
-      translate.run();
-    }
-  );
+  require(["modules/pmapi"], function (pmapi) {
+    console.log(pmapi);
+    pmapi.run();
+  });
 }());
 

@@ -12,23 +12,23 @@
     <meta property="og:description" content="The Task Manager is a web mobile
     applicaion based on HTML5, CSS3, Javascript, Jquery, Jquery Mobile, Grunt,
     Requirejs and many other plugins, no servers side language like php, java
-    and so on... is needed. Data are fetch and retrieved by a more powerfull 
+    and so on... is needed. Data are fetch and retrieved by a more powerfull
     API named JIO. busness rules are now implemented by the client layer, data
-    can be store either on localstorage for the browser or on remote storage 
+    can be store either on localstorage for the browser or on remote storage
     like S3, Webdav, xwiki, dropbox and so on. The librairy named jIO provide
     methods(get, post, put, allDocs) for manipulating data. The application is
-    integrating webapp, enabling offline support. At runtime, all files are 
+    integrating webapp, enabling offline support. At runtime, all files are
     downloaded into the user's device (browser cache), witch make the application
     faster the new time. It can run on laptop, tablets, smartphone and all devices
     having a web browser regardless of the OS."/>
     <meta property="og:image" content="js/lib/jquerymobile/images/home.png"/>
-    <meta property="og:image:type" content="image/png" /> 
-    <meta property="og:image:width" content="48" /> 
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="48" />
     <meta property="og:image:height" content="48" />
     <meta property="og:url" content="http://task-manager.site44.com/"/>
     <meta property="og:site_name" content="Task Manager"/>
     <meta property="fb:admins" content=""/>
-    
+
     <title>Home</title>
     <script data-main='js/main' src='js/lib/requirejs/require.js'></script>
   </head>
@@ -37,14 +37,14 @@
        <!-- header-->
       <div data-role='header' data-mini='true' data-position='fixed' data-theme='b' data-inset='true'>
         <select name='sortby' id='sortby' data-mini='true'>
-          <option value='#'>sort by</option>
-          <option value='title'>Title</option>
-          <option value='begindate'>Begin date</option>
-          <option value='enddate'>End date</option>
-          <option value='state'>State</option>
+          <option value='#' class='t'  data-i18n='tasks.header.sortby.#'>sort by</option>
+          <option value='title' class='t' data-i18n='tasks.header.sortby.title'>Title</option>
+          <option value='begindate' class='t' data-i18n='tasks.header.sortby.begindate'>Begin date</option>
+          <option value='enddate' class='t' data-i18n='tasks.header.sortby.enddate'>End date</option>
+          <option value='state' class='t' data-i18n='tasks.header.sortby.state'>State</option>
         </select>
-        <H2>Task manager</H2>
-        <a href='details.html' class='newtaskbutton ui-btn-right' data-icon='plus'>New task</a>
+        <H2 class='t' data-i18n='tasks.header.h2'>Task manager</H2>
+        <a href='details.html' class='newtaskbutton ui-btn-right t' data-i18n='tasks.header.newtask' data-icon='plus'>New task</a>
       </div>
       <!-- content-->
       <div data-role='content' data-theme='a'>
@@ -53,9 +53,9 @@
       <!-- footer -->
       <div data-role='footer' class='footercontent' data-mini='true' data-position='fixed' data-theme='b'>
         <div data-role='controlgroup' data-type='horizontal' data-mini='true'>
-          <a href='project.html' data-role='button' class='projectbutton' data-icon='arrow-l'>Projects</a>
-          <a href='#' class='tasklistbutton ui-btn-active' data-icon='arrow-u' data-role='button' >Tasks</a>
-          <a href='settings.html' data-role='button' class='settingsbutton' data-icon='gear'>Settings</a>
+          <a href='project.html' data-role='button' class='projectbutton t' data-icon='arrow-l' data-i18n='tasks.footer.nav.projects'>Projects</a>
+          <a href='#' class='tasklistbutton ui-btn-active t' data-icon='arrow-u' data-role='button' data-i18n='tasks.footer.nav.tasks'>Tasks</a>
+          <a href='settings.html' data-role='button' class='settingsbutton t' data-icon='gear' data-i18n='tasks.footer.nav.settings'>Settings</a>
         </div>
       </div>
     </div>

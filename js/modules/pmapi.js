@@ -3,23 +3,65 @@
 setTimeout, insertstates, insertprojects, inserttasks, displaytasks,
 define, document, $, confirm, location, parent*/
 
+/*
+(function (dependencies, module) {
+  "use strict";
+  if (typeof define === 'function' && define.amd) {
+    return define(dependencies, module);
+  }
+  if (typeof exports === 'object') {
+    return module(exports,
+      require('jquery'),
+      require('jio'),
+      require('i18next'),
+      require('sha256'),
+      require('overrides'),
+      require('localstorage'),
+      require('complex_queries'),
+      require('jqm'),
+      require('rsvp'),
+      require('json'),
+      require('text'),
+      require('css'),
+      require('css!modules/pmapi.css'),
+      require('css!lib/jquerymobile/jquery.mobile-1.4.0pre.css')
+    );
+  }
+ // window.jIO = {};
+  //module(window.jIO, RSVP, {hex_sha256: hex_sha256});
+}(['exports', 'jquery', 'jio', 'i18next',
+  'sha256', 'overrides', 'localstorage',
+  'localstorage', 'complex_queries', 'jqm',
+  'rsvp', 'json', 'text', 'css',
+  'css!modules/pmapi.css',
+  'css!lib/jquerymobile/jquery.mobile-1.4.0pre.css'
+  ], function (exports, $, jIO) {
+  "use strict";
+
+
+});
+
+
+*/
+//////////////////////////
 define(
-  ["jquery", 
+  ["jquery",
     "jio",
     "i18next",
     "sha256",
     "overrides",
+   // "normalize",
     "localstorage",
     "complex_queries",
     "jqm",
+    //"rsvp",
     "json",
     "text",
     "css",
     "css!modules/pmapi.css",
     "css!lib/jquerymobile/jquery.mobile-1.4.0pre.css"
-  ], function ($, jIO, i18next) {
+  ], function ($, jIO) {
   "use strict";
-
 
   var pmapi = {};
   pmapi.run = function () {
@@ -45,13 +87,32 @@ define(
       jio_config = jIO.createJIO({
         "type": "local",
         "username": "Admin",
+      //translate.run();
         "application_name": "TASK-MANAGER_config"
       }),
       ident = "auto",  //to send task id to details.html page
       jio = jio_local,
       jio_active_id = "1",
-      jio_list = new Array();
+      curr_lang = "en",  //default language
+      jio_list = new Array(),
+      set_lang = function (curr_lang) {  //perfom the new selected language translation
+        $.i18n.setLng(curr_lang, function(t) {
+          $(document).find('.t').i18n();
+          console.log(curr_lang);
+        });
+      };
       jio_list.push({"id": "1", "name": jio_local});
+
+      $.i18n.init({   //initial setup for translation
+        lng: 'en',
+        load: 'current',
+        detectLngQS: 'lang',
+        fallbackLng: false,
+        ns: 'translation',
+        resGetPath: 'lang/__lng__/__ns__.json'
+      }, function (t) {
+        //console.log($.i18n);
+      });
 
     function insertstaffs(i, j, jsontasks) {
       if (j === 0) { //j===0 ==> posting project
@@ -91,11 +152,14 @@ define(
 
     function filtasklist(err, rep) {
       var i, ftext, cur_row, str = "";
+      console.log(rep);
       if (rep.data.total_rows === 0) {
         ident = "auto";
-        $(".content-listview").empty().append("<span>No task found, " +
-          "click on right top button to create a new task</span>")
+        $(".content-listview").empty()
+          .append("<span class='t' data-i18n='tasks.content.empty'>No task " +
+          " found, click on right top button to create a new task</span>")
           .listview("refresh");
+          set_lang (curr_lang);
       }
 
       if (rep.data.rows[0].doc) {
@@ -108,7 +172,9 @@ define(
           str += "<li data-filtertext='" + ftext + "'>" +
             "<a class='myLink' href='details.html' data-id='" + cur_row._id +
             "'><span class='titleSpan'>" + cur_row.title + "</span><br/>" +
-            "<i>from " + cur_row.begindate.substring(0, 10) + "&nbsp;to " +
+            "<i><span class='t' data-i18n='tasks.content.from'>from </span>" +
+            cur_row.begindate.substring(0, 10) +
+            "&nbsp;<span class='t' data-i18n='tasks.content.to'>to </span>" +
             cur_row.enddate.substring(0, 10) + "</i><br/>" +
             "<span class='myspan'>" + cur_row.state + "</span></a></li>";
         }
@@ -123,18 +189,25 @@ define(
           str += "<li data-filtertext='" + ftext + "'>" +
             "<a class='myLink' href='details.html' data-id='" + cur_row._id +
             "'><span class='titleSpan'>" + cur_row.title + "</span><br/>" +
-            "<i>from " + cur_row.begindate.substring(0, 10) + "&nbsp;to " +
+            "<i><span class='t' data-i18n='tasks.content.from'>from </span>" +
+            cur_row.begindate.substring(0, 10) +
+            "&nbsp;<span class='t' data-i18n='tasks.content.to'>to </span>" +
             cur_row.enddate.substring(0, 10) + "</i><br/>" +
             "<span class='myspan'>" + cur_row.state + "</span></a></li>";
         }
       }
       setTimeout(function () {
         $(".content-listview").empty().append(str).listview("refresh");
+        // perform translation on placeholder
+        $(".ui-input-search input")
+          .addClass("t")
+            .attr("data-i18n", "[placeholder]tasks.content.placeholder;");
+
         if (ident != "auto") {
           $("a[data-id='" + ident + "']").addClass('ui-btn-active');
         }
         ident = "auto";
-
+        set_lang (curr_lang);
         ///////////////////
          /*   var dav = davstorage.createDescription("http://192.168.242.74/uploads", "basic", null, "admin", "admin");
           c onsole*.log(dav);
@@ -161,7 +234,7 @@ define(
       } else {
         require(["json!data/tasks.json"], function (tasks) {
           insertstaffs(0, 0, tasks); //insert projects, state and tasks
-          //console.log(french);
+          console.log(tasks);
         });
         jio_config.post({
           "_id": "1",
@@ -222,7 +295,7 @@ define(
             timer = null;
             filterValue = val.trim();
             filterValue = filterValue
-                          .charAt(0).toUpperCase() + filterValue.slice(1);
+              .charAt(0).toUpperCase() + filterValue.slice(1);
             sort_string = "title: = %" + filterValue +
               "% OR project: = %" + filterValue +
               "% OR begindate: = %" +  filterValue +
@@ -307,8 +380,10 @@ define(
                 if (task.project === projects[j]) {
                   st += "<li><a class='myLink' href='details.html' data-id='" +
                     task._id + "'><span class='titleSpan'>" +
-                    task.title + "</span><br/><i>from " +
-                    task.begindate.substring(0, 10) + "&nbsp;to " +
+                    task.title + "</span><br/><i>" +
+                    "<span class='t' data-i18n='tasks.content.from'>from </span>" +
+                    task.begindate.substring(0, 10) +
+                    "&nbsp;<span class='t' data-i18n='tasks.content.to'>to </span>" +
                     task.enddate.substring(0, 10) +
                     "</i><br/><span class='myspan'>" + task.state +
                     "</span></a></li>";
@@ -319,8 +394,9 @@ define(
             }
             str += "</div>";
             $("#pagecontent").empty().append(str).trigger("create");
-            $("#translate-button").addClass("ui-btn-right");
+
             ident = "auto";
+            set_lang (curr_lang);
           }
         );
       });
@@ -330,8 +406,8 @@ define(
       /**************** interaction for SETTINGS page ****************/
       /***************************************************************/
       $(document).on("pagebeforeshow.settings", "#settings", function (e, d) {
-      //console.log("settings page loaded");
-      // button states footer menu
+        console.log("settings page loaded");
+        // button states footer menu
         if ($('.projectbutton').hasClass('ui-btn-active')) {
           $('.projectbutton').removeClass('ui-btn-active');
         }
@@ -339,6 +415,7 @@ define(
           $('.tasklistbutton').removeClass('ui-btn-active');
         }
         $('.settingsbutton').addClass('ui-btn-active');
+        //$("#translate-button").addClass("ui-btn-right");
 
         //get list of existing states
         jio_state.allDocs(
@@ -350,7 +427,7 @@ define(
           function (err, response) {
             var i, str = "", cur_row; //section1(states)
             str = "<div data-role='fieldcontain' id='statesset' " +
-              "data-mini='true'><form id='stateform'>States:<fieldset " +
+              "data-mini='true'><form id='stateform'><span  class='t' data-i18n='settings.content.states'>States</span>:<fieldset " +
               "data-role='controlgroup' id='statefieldset'>";
             for (i = 0; i < response.data.total_rows; i += 1) {
               cur_row = response.data.rows[i].value;
@@ -358,12 +435,12 @@ define(
                 cur_row.state + "' id='" + cur_row._id + "' type='checkbox'/>" +
                 cur_row.state + "</label>";
             }
-            str += "</fieldset><div data-role='controlgroup' " + 
+            str += "</fieldset><div data-role='controlgroup' " +
               "data-type='horizontal' data-mini='true' class='controlsclass'>" +
-              "<a href='#' data-role='button' class='removestatebutton' " +
-              "data-icon='delete'>Delete</a>" +
-              "<a data-role='button' class='addstatebutton' " +
-              "data-icon='plus'>Add</a></div></form></div>";
+              "<a href='#' data-role='button' class='removestatebutton t' " +
+              "data-icon='delete' data-i18n='settings.content.delete'>Delete</a>" +
+              "<a data-role='button' class='addstatebutton t' " +
+              "data-icon='plus' data-i18n='settings.content.add'>Add</a></div></form></div>";
               // get list of existing projects
             jio_project.allDocs(
               { "query": "_id: = %",
@@ -374,7 +451,7 @@ define(
               function (err, resp) {
                 var i, str2 = "", str3 = "";  //section 3 (projects)
                 str2 += "<br/><div data-role='fieldcontain' id='projectsset' " +
-                  "data-mini='true'><form id='projectform'>Projects:" +
+                  "data-mini='true'><form id='projectform'><span class='t' data-i18n='settings.content.projects'>Projects</span>:" +
                   "<fieldset data-role='controlgroup' id='projectfieldset'>";
                 for (i = 0; i < resp.data.total_rows; i += 1) {
                   str2 += "<label><input type='checkbox' data-mini='true' " +
@@ -386,23 +463,24 @@ define(
                 str2 += "</fieldset><div data-role='controlgroup' " +
                   "data-type='horizontal' class='controlsclass' " +
                   "data-mini='true'><a href='#' data-role='button'" +
-                  "class='removeprojectbutton' data-icon='delete'>Delete</a>" +
-                  "<a data-role='button' class='addprojectbutton' " +
-                  "data-icon='plus'>Add</a></div></form></div>";
+                  "class='removeprojectbutton t' data-icon='delete' data-i18n='settings.content.delete'>Delete</a>" +
+                  "<a data-role='button' class='addprojectbutton t' " +
+                  "data-icon='plus' data-i18n='settings.content.add'>Add</a></div></form></div>";
                 str += str2 + "<br/><hr/><table data-role='table' " + //section storages
                   "data-mode='columntoggle' id='table' class='ui-responsive" +
-                  " table-stroke'><thead><tr><th data-priority='1'>Type" +
-                  "</th data-priority='1'><th data-priority='4'>Username</th>" +
-                  "<th data-priority='1'>App name</th><th data-priority='1'>" +
+                  " table-stroke'><thead><tr><th data-priority='1' class='t' data-i18n='settings.content.type'>Type" +
+                  "</th data-priority='1'><th data-priority='4' class='t' data-i18n='settings.content.username'>Username</th>" +
+                  "<th data-priority='1' class='t' " +
+                  "data-i18n='settings.content.appname'>App name</th>" +
+                  "<th data-priority='1' class='t' data-i18n='settings.content.switch'>" +
                   "Switch</th></tr></thead><tbody>";
 
                 jio_config.allDocs({"include_docs": true}, function (err, r) {
-                  //console.log(r.data);
                   for (i = 0; i<r.data.total_rows; i++) {
 
                     str3 += "<tr><td><span class='ok'>" + r.data.rows[i].doc.type +
                       "</span></td><td>" + r.data.rows[i].doc.username + "</td><td>" +
-                      "<a href='#storp' class='blabla' data-appname='" + 
+                      "<a href='#storp' class='blabla' data-appname='" +
                       r.data.rows[i].doc.application_name +
                       "' data-type='" + r.data.rows[i].doc.type + "'";
                     if (r.data.rows[i].doc.type === "dav") {
@@ -425,20 +503,42 @@ define(
                     }
                   }
                   str += str3 + "</tbody></table>" +
-                    "<div data-role='controlgroup' data-type='horizontal'>" +
-                    "<a data-role='button' class='addstorage' href='#storp'" +
+                  "<hr/><div data-role='controlgroup' data-type='horizontal' class='storagediv'>" +
+                  "<select name='type' id='storagetype' data-mini='true'>" +
+                    "<option value='new'>-- new storage --</option>" +
+                    "<option value='local'>Local</option>" +
+                    "<option value='dav'>Dav</option>" +
+                    "<option value='replicate'>Replicate</option></select>&nbsp;" +
+                    "<a data-role='button' class='addstorage t ui-disabled' href='#storp'" +
                     " data-position-to='window' data-mini='true' " +
-                    "data-icon='plus' data-rel='popup'>Add</a></div>";
+                    "data-icon='plus' data-rel='popup' " +
+                    "data-i18n='settings.content.add' >Add</a></div>";
                   $("#settingscontent").empty().append(str).trigger("create");
+
+                  //setup dynamic generated data translation
+                  var data_i18n = $("option[value='" + curr_lang + "']").attr("data-i18n");
+                  $("#translate-button").find("span").attr("data-i18n", data_i18n);
+                  $("a.ui-table-columntoggle-btn").attr("data-i18n", "settings.content.columns").addClass("t");
+
+                  set_lang (curr_lang);
                   jio_config.allDocs({"include_docs": true}, function (e, rep) {
-                    try_storage(rep, 0); 
+                  try_storage(rep, 0);
                   });
                 });
-              }
-            );
-          }
-        );
-      });
+              });
+          });
+          $("#translate").change(function(e, data){ //bind a callback to perform translation when a language change
+            var data_i18n;
+            curr_lang = $("#translate").val();
+            if (curr_lang === $.i18n.options.lng) {
+              return false;
+            };
+            data_i18n = $("option[value='" + curr_lang + "']").attr("data-i18n");
+            $("#translate-button").find("span").attr("data-i18n", data_i18n);
+            $("a.ui-table-columntoggle-btn").attr("data-i18n", "settings.content.columns").addClass("t");
+            set_lang (curr_lang);
+          });
+        });
 
       var storage = {},
         storageaction = "",           //will be set to "create/edit"
@@ -461,7 +561,7 @@ define(
         };
 
       $(document).on("click", ".blabla", initstorage);
-
+////////////////////
       $(document).on("click", ".addstorage", function(e) {
         initstorage();
         storageaction = "create";
@@ -686,7 +786,7 @@ define(
       ***** Check if storage list form jio_config are available *****
       **************************************************************/
       function try_storage (response, i) {
-        var jio_jio, i, k = 0, abscent = true, storage = {}, 
+        var jio_jio, i, k = 0, abscent = true, storage = {},
           jio_object = {},
         storg = response.data.rows[i];
 
@@ -823,8 +923,7 @@ define(
           return false;
         }
         state = state.charAt(0).toUpperCase() + state.slice(1);
-        if (!/^[a-z0-9_ ]+$/i.test(state)) {//Check state to match [a-zA-Z _]
-          alert("Expected characters: [a - z, 0 - 9, A - Z_]");
+        if (state.lenght < 1) {//Check state to match [a-zA-Z _]
           return false;
         }
         //Find the last ID for incrementing and assigne to the new state
@@ -913,8 +1012,7 @@ define(
         }
         project = project.charAt(0).toUpperCase() + project.slice(1);
         //check the project name to match [a-z, A-Z_ ]
-        if (!/^[a-z0-9_ ]+$/i.test(project)) {
-          alert("Expected characters: [a-z, 0-9, A-Z_ ]");
+        if (project.length < 1) {
           return false;
         }
         //finding the last ID for incrementing and assign to the new project
@@ -925,7 +1023,7 @@ define(
             "wildcard_character": '%'
             },
           function (err, r) {
-            //calculating the new ID 
+            //calculating the new ID
             var n =  parseInt(r.data.rows[0].value._id.split('-')[1], 10) + 1,
               key = "PR-" + n,
               str,
@@ -958,21 +1056,21 @@ define(
         if (title) {
           title = title.trim();
         }
-        if ((!/^[a-z0-9_ ]+$/i.test(title))) {
+        if (title.length < 1) {
           $("#title")
-            .attr("placeholder", "Title is required")
+           // .attr("placeholder", "Title is required")
             .addClass("ui-focus").css("border", "1px solid red");
           return false;
         }
         if (document.getElementById("begindate").value === "") {
           $("#begindate")
-            .attr("placeholder", "Begin date required")
+            //.attr("placeholder", "Begin date required")
             .addClass("ui-focus").css("border", "1px solid red");
           return false;
         }
         if (document.getElementById("enddate").value === "") {
           $("#enddate")
-            .attr("placeholder", "End date required")
+            //.attr("placeholder", "End date required")
             .addClass("ui-focus").css("border", "1px solid red");
           return false;
         }
@@ -996,16 +1094,18 @@ define(
       var bindfocus = function () {
         $("#details input").focus(function (e) { //validation features
           if (this.id === "title") {
-            $("#title").attr("placeholder", "Title").css("border", "");
+            $("#title")
+              //.attr("placeholder", "Title")
+                 .css("border", "");
           } else {
             if (this.id === "begindate") {
               $("#begindate")
-              .attr("placeholder", "Begin(yyyy-mm-dd)")
+              //.attr("placeholder", "Begin(yyyy-mm-dd)")
                 .removeClass("ui-focus").css("border", "");
             } else {
               if (this.id === "enddate") {
                 $("#enddate")
-                .attr("placeholder", "End(yyyy-mm-dd)")
+               // .attr("placeholder", "End(yyyy-mm-dd)")
                   .removeClass("ui-focus").css("border", "");
               }
             }
@@ -1031,7 +1131,7 @@ define(
           function (err, response) {
             statestr = "<select name='state' id='state' data-id ='state' " +
               " data-inline='true' data-mini='true' >" +
-              "<option value='#'>-- state --</option>";
+              "<option value='#' class='t' data-i18n='details.content.selectstate'>-- state --</option>";
             for (i = 0; i < response.data.total_rows; i += 1) {
               statestr += "<option value='" + response.data.rows[i].doc.state +
                 "'>" + response.data.rows[i].doc.state + "</option>";
@@ -1044,7 +1144,7 @@ define(
                 var str = "", params, attArray;
                 prostr = "<select name='project' data-id ='project'" +
                   " id='project' data-inline='true' data-mini='true'>" +
-                  "<option value='#'>-- project --</option>";
+                  "<option value='#' class='t' data-i18n='details.content.selectproject'>-- project --</option>";
                 for (i = 0; i < resp.data.total_rows; i += 1) {
                   prostr += "<option value='" + resp.data.rows[i].doc.project +
                     "'>" + resp.data.rows[i].doc.project + "</option>";
@@ -1054,31 +1154,41 @@ define(
                   //console.log("new task");
                   str = "<form><div data-role='fieldcontain' data-mini=" +
                     "'true'><input type='text' id='title' name='title' " +
-                    "data-mini='true' placeholder='Title'/><input " +
+                    "data-mini='true' placeholder='Title' class='t' data-i18n='[placeholder]details.content.title'/><input " +
                     "type='hidden' id='id' name='id' value='auto'/><div " +
                     "data-role='fieldcontain' data-mini='true' class=" +
                     "'datediv'><input name='begindate' id='begindate' " +
-                    "placeholder='Begin(yyyy-mm-dd)' type='date' data-mini='true'/>" +
+                    "placeholder='Begin(yyyy-mm-dd)' type='date' data-mini='true' class='t' data-i18n='[placeholder]details.content.begindateformat'/>" +
                     "</div><div data-role='fieldcontain' data-mini='true' " +
                     "class='datediv'><input name='enddate' id='enddate' " +
-                    "type='date' data-mini='true' placeholder='End(yyyy-mm-dd)'/>" +
+                    "type='date' data-mini='true' placeholder='End(yyyy-mm-dd)' class='t' data-i18n='[placeholder]details.content.enddateformat' />" +
                     "</div><div data-role='fieldcontain' data-mini='true' >" +
                     prostr + "</div>" +
                     "<div data-role='fieldcontain' data-mini='true' >" +
                     statestr + "</div>" +
                     "<div data-role='fieldcontain' data-mini='true' >" +
                     "<textarea name='description' id='description' " +
-                    " data-mini='true' placeholder='Description'>" +
+                    " data-mini='true' placeholder='Description' class='t'" +
+                    " data-i18n='[placeholder]details.content.description'>" +
                     "</textarea></div><br/>" +
                     "<div data-role='controlgroup' data-type='horizontal' " +
                     "><a href='index.html' data-mini='true' " +
-                    "class='deletetaskbutton ui-disabled' data-icon='delete'" +
-                    " data-role='button'>" +
+                    "class='deletetaskbutton ui-disabled t' data-icon='delete'" +
+                    " data-role='button' data-i18n='details.content.delete'>" +
                     "Delete</a><a href='index.html' " +
-                    "class='savebut' data-mini='true' data-icon='check' " +
-                    "data-role='button' >Save</a></div></form>";
+                    "class='savebut t' data-mini='true' data-icon='check' " +
+                    "data-role='button' data-i18n='details.content.save'>Save</a></div></form>";
                   $(".fieldcontain1").empty().append(str).trigger("create");
-                  bindfocus();
+                  //perform translation to dynamic select menu generated
+                  $("#state-button")
+                    .find("span")
+                      .attr("data-i18n", "details.content.selectstate");
+                  $("#project-button")
+                    .find("span")
+                      .attr("data-i18n", "details.content.selectproject");
+
+                  bindfocus();  // for validation stuffs [tocheck translation]
+                  set_lang (curr_lang);
                 } else {//edition task
                   //console.log("editing task");
                   jio.allDocs(
@@ -1094,46 +1204,47 @@ define(
                     },
                     function (err, res) {
                       str = "<form><div data-role='fieldcontain'" +
-                        " data-mini='true'><label for='title'>Title:</label>" +
+                        " data-mini='true'><label for='title' class='t' data-i18n='details.content.title'>Title:</label>" +
                         " <input type='text' id='title' name='title'  value='" +
                         res.data.rows[0].value.title + "' data-mini='true'" +
                         " placeholder='Title'/></div><input type='hidden'" +
                         " name='id' value='" + res.data.rows[0].value._id +
                         "' id='id'/><div data-role='fieldcontain' " +
                         "data-mini='true' class='datediv'>" +
-                        "<label for='begindate' class='datelabel'>Begin&nbsp;date:" +
+                        "<label for='begindate' class='datelabel t' data-i18n='details.content.begindate'>Begin&nbsp;date:" +
                         "</label><input name='begindate' id='begindate'" +
                         " placeholder='Begin date' data-mini='true' value='" +
                         res.data.rows[0].value.begindate.substring(0, 10) +
                         "' type='date'/></div><div data-role='fieldcontain'" +
                         " data-mini='true' class='datediv'><label " +
-                        " for='enddate'class='datelabel'>End&nbsp;date:</label>" +
+                        " for='enddate'class='datelabel t' data-i18n='details.content.enddate'>End&nbsp;date:</label>" +
                         "<input name='enddate' id='enddate' type='date' value='" +
                         res.data.rows[0].value.enddate.substring(0, 10) + "'" +
                         " placeholder='End date' data-mini='true'/></div>" +
                         "<div data-role='fieldcontain' " +
-                        "data-mini='true'><label for='project'>Project:" +
+                        "data-mini='true'><label for='project' class='t' data-i18n='details.content.project'>Project:" +
                         "</label>" + prostr + "</div><div data-role=" +
                         "'fieldcontain' data-mini='true'><label " +
-                        "for='project'>State:</label>" + statestr + "</div>" +
+                        "for='state' class='t' data-i18n='details.content.state'>State:</label>" + statestr + "</div>" +
                         "<div data-role='fieldcontain' data-mini='true'>" +
-                        "<label for='description'>Description:</label>" +
+                        "<label for='description' class='t' data-i18n='details.content.description'>Description:</label>" +
                         "<textarea name='textarea' id='description' " +
                         "data-mini='true' placeholder='Description'>" +
                         res.data.rows[0].value.description + "</textarea>" +
                         "</div><br/><div data-role='controlgroup' " +
                         "data-type='horizontal' class='cg'><a href='#' " +
                         "data-mini='true' data-rel='back' " +
-                        "class='deletetaskbutton' data-icon='delete' " +
-                        "data-role='button'>Delete</a><a href='index.html'" +
-                        " class='savebut' data-mini='true' data-icon='check'" +
-                        " data-role='button'>Save</a></div></form>";
+                        "class='deletetaskbutton t' data-icon='delete' " +
+                        "data-role='button' data-i18n='details.content.delete'>Delete</a><a href='index.html'" +
+                        " class='savebut t' data-mini='true' data-icon='check'" +
+                        " data-role='button' data-i18n='details.content.save'>Save</a></div></form>";
                       $(".fieldcontain1").empty().append(str).trigger("create");
                       $("#project").val(res.data.rows[0].value.project)
                         .selectmenu("refresh");
                       $("#state").val(res.data.rows[0].value.state)
                         .selectmenu("refresh");
                       bindfocus(); //handle validation effects
+		                  set_lang (curr_lang);
                     }
                   );
                 }
@@ -1150,7 +1261,7 @@ define(
         setTimeout(function () {
           if (!validator()) {// stop if no valid field ocur
             return false;
-          }; 
+          };
           object._id = document.getElementById("id").value;
           object.title = document.getElementById("title").value.charAt(0)
             .toUpperCase() + document.getElementById("title").value.slice(1);
@@ -1170,9 +1281,9 @@ define(
                 },
               function (err, re) {
                 if (re.data.total_rows === 0){
-                  object._id = "T-0000";
+                  object._id = "T-0";
                 } else {
-                  n = parseInt(re.data.rows[0].value._id.split('-')[1], 10) + 1;
+                    n = parseInt(re.data.rows[0].value._id.split('-')[1], 10) + 1;
                   object._id = "T-" + n;
                 }
                 jio.put(object, function (err, response) {
@@ -1238,13 +1349,8 @@ define(
           }
         });
       }
-
-      //translation 
-      /*$("#translate").change(function(e, data){
-        console.log(e.target);
-        console.log(i18next);
-      });*/
     }
   };
   return pmapi;
 });
+//}));

@@ -1,13 +1,8 @@
-{
+﻿{
     "projects": {
         "header": {
             "h2": "项目",
-            "translate": {
-                "en": "英语",
-                "fr": "法国人",
-                "ch": "中国的"
-            },
-            "back": "后面"
+            "back": "后退"
         },
         "footer": {
             "nav": {
@@ -16,5 +11,85 @@
                 "settings": "设置"
             }
         }
+    },
+    "tasks": {
+        "header": {
+            "h2": "任务管理器",
+            "sortby": {
+                "#": "分类",
+                "title": "标题",
+                "begindate": "开始日期",
+                "enddate": "结束日期",
+                "state": "状态"
+            },
+            "newtask": "新任务"
+        },
+        "content": {
+          "from": "从 ",
+          "to": "至 ",
+          "placeholder": "过滤标题，状态，日期或项目",
+          "empty": "无任务，点击右上方键创建新任务"
+        },
+        "footer": {
+            "nav": {
+                "projects": "项目",
+                "tasks": "任务",
+                "settings": "设置"
+            }
+        }
+    },
+    "settings": {
+      "header": {
+        "h2": "设置",
+        "home": "主页",
+        "translate": {
+          "en": "English",
+          "fr": "Français",
+          "ch": "中文"
+        }
+      },
+      "content": {
+          "delete": "删除",
+          "add": "添加",
+          "states": "状态",
+          "projects": "项目",
+          "type": "类型",
+          "username": "用户名",
+          "appname": "程序名称",
+          "switch": "任务转换",
+          "columns": "显示列",
+          "default": "初始",
+          "completed": "完成",
+          "continued": "继续",
+          "started": "开始"
+       },
+      "footer": {
+        "nav": {
+          "projects": "项目",
+          "tasks": "任务",
+          "settings": "设置"
+        }
+      }
+    },
+    "details": {
+      "header": {
+        "back": "后退",
+        "h2": "详细信息",
+        "home": "主页"
+      },
+      "content": {
+        "title": "标题",
+        "begindate": "开始日期",
+        "enddate": "结束日期",
+        "project": "项目",
+        "state": "状态",
+        "description": "描述",
+        "delete": "删除",
+        "save": "储存",
+        "selectproject": "-- 项目 --",
+        "selectstate": "-- 状态 --",
+        "begindateformat": "开始(aaaa-mm-jj)",
+        "enddateformat": "结束(aaaa-mm-jj)"
+      }
     }
 }
