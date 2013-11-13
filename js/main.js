@@ -1,8 +1,8 @@
-(function () {
+﻿(function () {
   "use strict";
 
   require.config({
-    waitSeconds: 2,
+    //waitSeconds: 3,
     paths: {
       //plugins (require-css, text, json)
       css:             "plugins/requirejs-plugins/require-css/css",
@@ -19,7 +19,9 @@
       complex_queries: "lib/jio/complex_queries",
       localstorage:    "lib/jio/localstorage",
       davstorage:      "lib/jio/davstorage",
-      translate:       "modules/translate",
+      erp5storage:     "lib/jio/erp5storage",
+      gidstorage:      "lib/jio/gidstorage",
+      replicatestorage: "lib/jio/replicatestorage",
       overrides:       "modules/overrides"
     },
     shim: {
@@ -34,13 +36,9 @@
       }
     }
   });
-
-  require(
-    ["modules/pmapi", "translate"],
-    function (pmapi, translate) {
-      pmapi.run();
-      translate.run();
-    }
-  );
+  require(["modules/pmapi"], function (pmapi) {
+    console.log(pmapi);
+    pmapi.run();
+  });
 }());
 

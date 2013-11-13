@@ -1,4 +1,4 @@
-CACHE MANIFEST
+﻿CACHE MANIFEST
 # 25/10/2013
 
 # Explicitly cached files
@@ -12,7 +12,6 @@ js/main.js
 js/modules/pmapi.js
 js/modules/pmapi.css
 js/modules/overrides.js
-js/modules/translate.js  
 
 js/data/tasks.json
 js/plugins/requirejs-plugins/json/json.js
@@ -28,7 +27,11 @@ lang/ch/translation.json
 
 js/lib/jio/complex_queries.js
 js/lib/jio/localstorage.js
-js/lib/jio/jio.js 
+js/lib/jio/davstorage.js
+js/lib/jio/erp5storage.js
+js/lib/jio/gidstorage.js
+js/lib/jio/replicatestorage.js
+js/lib/jio/jio.js
 js/lib/jio/sha256.amd.js
 js/lib/jio/rsvp-custom.amd.js
 

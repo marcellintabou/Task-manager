@@ -1,38 +1,42 @@
 ﻿{
   "view": "normal",
   "projects":    [
-        {"_id": "PR-1", "project": "Default"}
+        { "type": "Task Report",
+          "project": "Default",
+          "project_i18n": "settings.content.default",
+          "reference": "e3581e49-85a1-b426-f747-2287bf1af2c1"
+        }
       ],
   "states":    [
-        { "_id": "ST-1", "state": "Started"},
-        {"_id": "ST-2", "state": "Confirmed"},
-        {"_id": "ST-3", "state": "Completed"}
+        {"type": "Task Report", "state": "Started", "reference": "4414119f-38de-6156-79af-e9e0aed6299e"},
+        {"type": "Task Report", "state": "Confirmed", "reference": "04ce1c47-4b9c-50de-8bd0-bcd7b6cbcb13"},
+        {"type": "Task Report", "state": "Completed", "reference": "4bba9d11-416a-43f1-08e9-51f83c440437"}
       ],
   "tasks":   [
-        {
-          "_id": "T-0000",
+        { "type": "Task Report",
           "title": "Jquery mobile in action",
           "project": "Default",
-          "begindate": "2013-05-19T22:00:00.000Z",
-          "enddate": "2013-11-01T23:00:00.000Z",
+          "reference": "59692355-7a24-da42-2904-26317e3534d6",
+          "start": "2013-05-19T22:00:00.000Z",
+          "stop": "2013-11-01T23:00:00.000Z",
           "state": "Completed",
           "description": "some description comming soon..."
         },
-        {
-          "_id": "T-0001",
+        { "type": "Task Report",
           "title": "HTML5 and CSS3 overview",
           "project": "Default",
-          "begindate": "2013-01-14T23:00:00.000Z",
-          "enddate": "2014-10-29T23:00:00.000Z",
+          "reference": "797b50ab-dd13-af83-8b7c-29ade5442833",
+          "start": "2013-01-14T23:00:00.000Z",
+          "stop": "2014-10-29T23:00:00.000Z",
           "state": "Started",
           "description": "task manager app with JQM"
         },
-        {
-          "_id": "T-0002",
+        { "type": "Task Report",
           "title": "Other staffs",
           "project": "Default",
-          "begindate": "2013-05-14T23:00:00.000Z",
-          "enddate": "2014-10-29T23:00:00.000Z",
+          "reference": "cf3ed322-ba23-15a9-35ec-91acaa783f11",
+          "start": "2013-05-14T23:00:00.000Z",
+          "stop": "2014-10-29T23:00:00.000Z",
           "state": "Confirmed",
           "description": "some description..."
         }

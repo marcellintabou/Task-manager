@@ -1,4 +1,4 @@
-module.exports = function (grunt) {
+﻿module.exports = function (grunt) {
   'use strict';
 
   grunt.initConfig({
@@ -74,10 +74,12 @@ module.exports = function (grunt) {
             normalize:       "plugins/requirejs-plugins/require-css/normalize",
             text:            "plugins/requirejs-plugins/text/text",
             json:            "plugins/requirejs-plugins/json/json",
+            i18next:         "plugins/i18next/i18next-1.7.1",
             //librairies (jquery, jquery mobile, jio)
             jquery:          "lib/jquery/jquery-1.10.1",
             jqm:             "lib/jquerymobile/jquery.mobile-1.4.0pre",
             sha256:          "lib/jio/sha256.amd",
+	    rsvp:            "lib/jio/rsvp-custom.amd",
             jio:             "lib/jio/jio",
             localstorage:    "lib/jio/localstorage",
             complex_queries: "lib/jio/complex_queries",
@@ -85,6 +87,7 @@ module.exports = function (grunt) {
           },
           shim: {
             "jquery": {exports: "$"},
+            "i18next": {deps: ["jquery"]},
             "jqm": {deps: ["jquery"], exports: "mobile"},
             "overrides": {deps: ["jquery"]}
           },
@@ -93,8 +96,8 @@ module.exports = function (grunt) {
           },
           //built code is transformed in some way.
           keepBuildDir: true,
-          optimize: "uglify2",
-          //optimize: "none",
+          //optimize: "uglify2",
+          optimize: "none",
           skipDirOptimize: false,
           //source maps as ".js.src" files.
           generateSourceMaps: false,
@@ -109,18 +112,19 @@ module.exports = function (grunt) {
           optimizeAllPluginResources: false,
           //by default.
           findNestedDependencies: true,
-          //If set to true, any files that were combined into a build 
+          //If set to true, any files that were combined into a build
           //layer will be removed from the output folder.
           removeCombined: true,
-          //only the root bundles will be included unless the locale: 
+          //only the root bundles will be included unless the locale:
           //section is set above.
           modules: [
             {
-              name: "modules/pmapi"
+              name: "modules/pmapi",
+	      include: ["css", "i18next", "jio", "complex_queries", "jqm", "overrides", "rsvp", "sha256", "localstorage"]
             }
           ],
           //RegExp via new RegExp().
-          fileExclusionRegExp: /^(dir|node_modules|grunt|package|Gruntfiles)$/,
+          fileExclusionRegExp: /^(dir|node_modules|grunt|package|Gruntfiles|test)$/,
           //work out how best to surface the license information.
           preserveLicenseComments: false,
           //Sets logging level.It's a number.If you want "silent" running,

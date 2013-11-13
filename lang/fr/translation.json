@@ -1,12 +1,7 @@
-{
+﻿{
     "projects": {
         "header": {
             "h2": "Projets",
-            "translate": {
-                "en": "Anglais",
-                "fr": "Français",
-                "ch": "Chinois"
-            },
             "back": "Retour"
         },
         "footer": {
@@ -16,5 +11,85 @@
                 "settings": "Paramètres"
             }
         }
+    },
+    "tasks": {
+        "header": {
+            "h2": "Gestionnaire de tâches",
+            "sortby": {
+                "#": "Trier par",
+                "title": "Titre",
+                "start": "Date de bébut",
+                "stop": "Date de fin",
+                "state": "Etat"
+            },
+            "newtask": "Nouvelle tâche"
+        },
+        "content": {
+          "from": "du ",
+          "to": "au ",
+          "placeholder": "filtrer par titre, état, dates ou projet",
+          "empty": "Aucune tâche trouvée, cliquez sur le bouton nouvelle tache pour en ajouter"
+        },
+        "footer": {
+            "nav": {
+                "projects": "Projets",
+                "tasks": "Tâches",
+                "settings": "Paramètres"
+            }
+        }
+    },
+    "settings": {
+        "header": {
+            "h2": "Paramètres",
+            "home": "Acceuil",
+            "translate": {
+              "en": "English",
+              "fr": "Français",
+              "ch": "中文"
+            }
+        },
+        "content": {
+          "delete": "Effacer",
+          "add": "Ajouter",
+          "states": "Etats",
+          "projects": "Projets",
+          "type": "Type",
+          "username": "Utilisateur",
+          "appname": "Applicaion",
+          "switch": "Basculer",
+          "columns": "Colonnes...",
+          "default": "Par défaut",
+          "completed": "Terminé",
+          "continued": "Continu",
+          "started": "entamé"
+        },
+        "footer": {
+            "nav": {
+                "projects": "Projets",
+                "tasks": "Tâches",
+                "settings": "Paramètres"
+            }
+        }
+    },
+    "details": {
+      "header": {
+        "back": "Précédent",
+        "h2": "Détails",
+        "back": "Retour"
+      },
+      "content": {
+        "title": "Titre",
+        "start": "Date début",
+        "stop": "Date fin",
+        "project": "Projet",
+        "state": "Etat",
+        "description": "Description",
+        "delete": "Effacer",
+        "save": "Enregistrer",
+        "selectproject": "--projet--",
+        "selectstate": "--état--",
+        "startformat": "Début(aaaa-mm-jj)",
+        "stopformat": "Fin(aaaa-mm-jj)"
+      }
     }
 }
