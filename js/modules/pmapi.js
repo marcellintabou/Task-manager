@@ -2,7 +2,7 @@
 /*global jQuery, window, console, jIO, localStorage, alert, jQuery, setTimeout,
   insertstates, insertprojects, inserttasks, displaytasks, define, document, $,
   confirm, location, parent, require, choose_Storage, try_storage,
-  check_storage, davstorage, applicationCache */
+  check_storage, davstorage, applicationCache, bindfocus, validator */
 
 /*
 (function (dependencies, module) {
@@ -470,9 +470,9 @@ define(
                   for (i = 0; i < resp.data.total_rows; i += 1) {
                     cur_row = resp.data.rows[i].doc;
                     str2 += "<label><input type='checkbox' data-mini='true' " +
-                    "name='" + cur_row.project + "' id='" + cur_row._id + 
-                    "' class='" + cur_row.project + "' data-ref='" + 
-                    cur_row.reference + "'/>" + cur_row.project + "</label>";
+                      "name='" + cur_row.project + "' id='" + cur_row._id +
+                      "' class='" + cur_row.project + "' data-ref='" +
+                      cur_row.reference + "'/>" + cur_row.project + "</label>";
                   }
                   str2 += "</fieldset><div data-role='controlgroup' " +
                     "data-type='horizontal' class='controlsclass' " +
@@ -495,7 +495,7 @@ define(
                     if (err) {
                       console.warn("Error on jio_config allDocs: ", err);
                     }
-                    for (i = 0; i < r.data.total_rows; i++) {
+                    for (i = 0; i < r.data.total_rows; i += 1) {
 
                       str3 += "<tr  class='ko'><td><span>" +
                         r.data.rows[i].doc.storage_type + "</span></td><td>" +
@@ -745,7 +745,7 @@ define(
           remove_storage (id);
         } else {
           jioToRemov = jio_list[i-1].name;
-          jioToRemov.allDocs({"include_docs": true}, function (err, respo) {
+          jioToRemov.allDocs({"include_docs": true}, function (e, respo) {
             if (respo) {
               if (respo.data.total_rows > 0) {
                 $("#storp").popup("close");
@@ -897,8 +897,7 @@ define(
                     "username": storg.doc.username,
                     "password": storg.doc.password
                   }
-                }
-              ]
+                }]
             });
           } else {
             if (storg.doc.storage_type === "dav") {
@@ -942,92 +941,92 @@ define(
               try_storage(response, i + 1);
             }
           });
-        };
+        },
 
-        /**************************************************************
-        ************ Check if a given storage is available ************
-        **************************************************************/
-        var check_storage = function (stor) {
-          var jio_object;
+          /**************************************************************
+          ************ Check if a given storage is available ************
+          **************************************************************/
+          check_storage = function (stor) {
+            var jio_object;
 
-          if (stor.storage_type === "replicate") {
-            jio_object = jIO.createJIO({
-              "type": "replicate",
-              "storage_list": [
-                {
-                  "type": "gid",
-                  "constraints": {
-                    "default": {
-                      "type": "string",
-                      "reference": "string"
+            if (stor.storage_type === "replicate") {
+              jio_object = jIO.createJIO({
+                "type": "replicate",
+                "storage_list": [
+                  {
+                    "type": "gid",
+                    "constraints": {
+                      "default": {
+                        "type": "string",
+                        "reference": "string"
+                      }
+                    },
+                    "sub_storage": {
+                      "type": "local",
+                      "username": stor.username,
+                      "application_name": "task-manager"
                     }
                   },
-                  "sub_storage": {
-                    "type": "local",
-                    "username": stor.username,
-                    "application_name": "task-manager"
-                  }
-                },
-                {
-                  "type": "gid",
-                  "constraints": {
-                    "default": {
-                      "type": "string",
-                      "reference": "string"
+                  {
+                    "type": "gid",
+                    "constraints": {
+                      "default": {
+                        "type": "string",
+                        "reference": "string"
+                      }
+                    },
+                    "sub_storage": {
+                      "type": "erp5",
+                      "url": stor.url,
+                      "username": stor.username,
+                      "password": stor.password
                     }
-                  },
-                  "sub_storage": {
-                    "type": "erp5",
-                    "url": stor.url,
-                    "username": stor.username,
-                    "password": stor.password
                   }
-                }
-              ]
-            });
-          } else if (stor.storage_type === "dav") {
-            jio_object = jIO.createJIO(
-              davstorage.createDescription(
-                stor.url,
-                stor.auth_type,
-                stor.realm,
-                stor.username,
-                stor.password
-              )
-            );
-          } else if (stor.storage_type === "erp5") {
-            jio_object = jIO.createJIO({
-              "type": "erp5",
-              "url":  stor.url,
-              "username": stor.username,
-              "password": stor.password
-            });
-          } else {
-            jio_object = jIO.createJIO({
-              "type": "local",
-              "username": stor.username,
-              "application_name": stor.appname
-            });
-          }
-          //check if the jio instance is available and put in jio_list if so
-          jio_object.allDocs(
-            {"include_docs": true},
-            function (err, resp) {
-              if (err) {
-                console.warn("err check_storage", err);
-              }
-              if (resp) {
-                $("input[id='" + stor._id + "']").checkboxradio("enable");
-                $("input[id='" + stor._id + "']")
-                  .parent()
-                  .parent()
-                  .parent()
-                  .removeClass("ko")
-                  .addClass("ok");
-              }
+                ]
+              });
+            } else if (stor.storage_type === "dav") {
+              jio_object = jIO.createJIO(
+                davstorage.createDescription(
+                  stor.url,
+                  stor.auth_type,
+                  stor.realm,
+                  stor.username,
+                  stor.password
+                )
+              );
+            } else if (stor.storage_type === "erp5") {
+              jio_object = jIO.createJIO({
+                "type": "erp5",
+                "url":  stor.url,
+                "username": stor.username,
+                "password": stor.password
+              });
+            } else {
+              jio_object = jIO.createJIO({
+                "type": "local",
+                "username": stor.username,
+                "application_name": stor.appname
+              });
             }
-          );
-        };
+            //check if the jio instance is available and put in jio_list if so
+            jio_object.allDocs(
+              {"include_docs": true},
+              function (err, resp) {
+                if (err) {
+                  console.warn("err check_storage", err);
+                }
+                if (resp) {
+                  $("input[id='" + stor._id + "']").checkboxradio("enable");
+                  $("input[id='" + stor._id + "']")
+                    .parent()
+                    .parent()
+                    .parent()
+                    .removeClass("ko")
+                    .addClass("ok");
+                }
+              }
+            );
+          };
 
         /****************************************************************
         *****************************************************************
@@ -1038,7 +1037,6 @@ define(
         $(document).on("click", ".removestatebutton", function (e, data) {
           var i = 0, statetr, s,
             stateToRemove = $('#stateform').serialize().split('&');
-            console.log(stateToRemove);
           function callback(err, resp) {
             if (err) {
               console.warn("Error on jio_state allDocs", err);
@@ -1079,16 +1077,15 @@ define(
                 $("input[name='" + s + "']").attr("checked", false)
                   .checkboxradio("refresh");
                 return false;
-              } else {
-                //select the ID of the state to remove in jIO
-                jio_state.allDocs(
-                  { "query": "state: = \"" + s + "\"",
-                    "select_list": ["_id", "state"],
-                    "wildcard_character": '%'
-                    },
-                  callback
-                );
               }
+              //select the ID of the state to remove in jIO
+              jio_state.allDocs(
+                { "query": "state: = \"" + s + "\"",
+                  "select_list": ["_id", "state"],
+                  "wildcard_character": '%'
+                  },
+                callback
+              );
             }
           }
         });
@@ -1253,7 +1250,7 @@ define(
         /***************************************************************/
         /**************** interaction for DETAILS page ****************/
         /***************************************************************/
-        function validator() {
+        var validator = function () {
 
           var start =  new Date(document.getElementById("start").value),
             end =  new Date(document.getElementById("stop").value),
@@ -1288,26 +1285,27 @@ define(
             return false;
           }
           return true;
-        }
+        },
 
-        var bindfocus = function () {
-          $("#details input").focus(function (e) { //validation features
-            if (this.id === "title") {
-              $("#title").css("border", "");
-            } else if (this.id === "start") {
-              $("#start").removeClass("ui-focus").css("border", "");
-            } else if (this.id === "stop") {
-              $("#stop").removeClass("ui-focus").css("border", "");
-            }
-          });
-          $("#details select").focus(function (e) {
-            if (this.id === "project") {
-              $("#project").parent().removeClass("ui-focus").css("border", "");
-            } else {
-              $("#state").parent().removeClass("ui-focus").css("border", "");
-            }
-          });
-        };
+          bindfocus = function () {
+            $("#details input").focus(function (e) { //validation features
+              if (this.id === "title") {
+                $("#title").css("border", "");
+              } else if (this.id === "start") {
+                $("#start").removeClass("ui-focus").css("border", "");
+              } else if (this.id === "stop") {
+                $("#stop").removeClass("ui-focus").css("border", "");
+              }
+            });
+            $("#details select").focus(function (e) {
+              if (this.id === "project") {
+                $("#project")
+                  .parent().removeClass("ui-focus").css("border", "");
+              } else {
+                $("#state").parent().removeClass("ui-focus").css("border", "");
+              }
+            });
+          };
 
         $(document).on("pagebeforeshow.details", "#details", function (e, d) {
           var statestr = "", prostr = "", i;
@@ -1402,10 +1400,10 @@ define(
                           "project"
                         ],
                         "wildcard_character": '%'
-                      },
-                      function (err, res) {
-                        if (err) {
-                          console.warn("Error jio.allDocs in detail.html:", err);
+                        },
+                      function (e, res) {
+                        if (e) {
+                          console.warn("Error jio.allDocs in detail.html:", e);
                         }
                         var r = res.data.rows[0].value;
                         str = "<form><div data-role='fieldcontain'" +
@@ -1563,8 +1561,9 @@ define(
             }
           });
         }
-      };
-    }
+      }
+    };
     return pmapi;
-  });
+  }
+);
 //}));

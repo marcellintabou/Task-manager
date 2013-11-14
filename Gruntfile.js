@@ -81,14 +81,18 @@
             sha256:          "lib/jio/sha256.amd",
             rsvp:            "lib/jio/rsvp-custom.amd",
             jio:             "lib/jio/jio",
-            localstorage:    "lib/jio/localstorage",
             complex_queries: "lib/jio/complex_queries",
+            localstorage:    "lib/jio/localstorage",
+            davstorage:      "lib/jio/davstorage",
+            erp5storage:     "lib/jio/erp5storage",
+            gidstorage:      "lib/jio/gidstorage",
+            replicatestorage: "lib/jio/replicatestorage",
             overrides:       "modules/overrides"
           },
           shim: {
             "jquery": {exports: "$"},
             "i18next": {deps: ["jquery"]},
-            "jqm": {deps: ["jquery"], exports: "mobile"},
+            "jqm":     { deps: ["jquery"], exports: "mobile" },
             "overrides": {deps: ["jquery"]}
           },
           map: {
@@ -96,8 +100,8 @@
           },
           //built code is transformed in some way.
           keepBuildDir: true,
-          //optimize: "uglify2",
-          optimize: "none",
+          optimize: "uglify2",
+          //optimize: "none",
           skipDirOptimize: false,
           //source maps as ".js.src" files.
           generateSourceMaps: false,
@@ -117,12 +121,13 @@
           removeCombined: true,
           //only the root bundles will be included unless the locale:
           //section is set above.
-          modules: [
+          /*modules: [
             {
               name: "modules/pmapi",
-              include: ["css", "i18next", "jio", "complex_queries", "jqm", "overrides", "rsvp", "sha256", "localstorage"]
+              exclude: ["rsvp"]
+              //include: ["css", "i18next", "jio", "complex_queries", "jqm", "overrides", "rsvp", "sha256", "localstorage"]
             }
-          ],
+          ],*/
           //RegExp via new RegExp().
           fileExclusionRegExp: /^(dir|node_modules|grunt|package|Gruntfiles|test)$/,
           //work out how best to surface the license information.
