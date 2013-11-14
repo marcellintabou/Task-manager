@@ -79,7 +79,7 @@
             jquery:          "lib/jquery/jquery-1.10.1",
             jqm:             "lib/jquerymobile/jquery.mobile-1.4.0pre",
             sha256:          "lib/jio/sha256.amd",
-	    rsvp:            "lib/jio/rsvp-custom.amd",
+            rsvp:            "lib/jio/rsvp-custom.amd",
             jio:             "lib/jio/jio",
             localstorage:    "lib/jio/localstorage",
             complex_queries: "lib/jio/complex_queries",
@@ -120,7 +120,7 @@
           modules: [
             {
               name: "modules/pmapi",
-	      include: ["css", "i18next", "jio", "complex_queries", "jqm", "overrides", "rsvp", "sha256", "localstorage"]
+              include: ["css", "i18next", "jio", "complex_queries", "jqm", "overrides", "rsvp", "sha256", "localstorage"]
             }
           ],
           //RegExp via new RegExp().
@@ -176,7 +176,10 @@
             "js/lib/jquerymobile/images/icons-36-black.png",
             "js/lib/jquerymobile/images/icons-36-white.png",
             "favicon.png",
-            "js/lib/jquerymobile/images/home.png"
+            "js/lib/jquerymobile/images/home.png",
+            "lang/en/translation.json",
+            "lang/fr/translation.json",
+            "lang/ch/translation.json"
           ],
           network: ["http://*", "https://*"],
           //exclude: ["js/jquery.min.js"],
@@ -189,32 +192,6 @@
         ],
         dest: "dir/manifest.appcache"
       }
-    },
-
-    /******************************************************
-    *** Creates manifest of files and associated hashes ***
-    *******************************************************/
-    "hash-manifest": {
-      dist: {
-        options: {
-          algo: "md5",
-          cwd: "dir"
-        },
-        src: [
-          "*.html",
-          "js/modules/pmapi.js",
-          "js/main.js",
-          "js/lib/requirejs/require.js",
-          "js/lib/jquerymobile/images/ajax-loader.gif",
-          "js/lib/jquerymobile/images/icons-18-black.png",
-          "js/lib/jquerymobile/images/icons-18-white.png",
-          "js/lib/jquerymobile/images/icons-36-black.png",
-          "js/lib/jquerymobile/images/icons-36-white.png",
-          "favicon.png",
-          "js/lib/jquerymobile/images/home.png"
-        ],
-        dest: "MANIFEST"
-      }
     }
   });
 
@@ -223,7 +200,6 @@
   grunt.loadNpmTasks('grunt-html-validation');
   grunt.loadNpmTasks('grunt-jsonlint');
   grunt.loadNpmTasks('grunt-manifest');
-  grunt.loadNpmTasks('grunt-hash-manifest');
 
   grunt.registerTask(
     'default',
@@ -231,8 +207,7 @@
       'requirejs',
       'validation',
       'jsonlint',
-      'manifest',
-      'hash-manifest'
+      'manifest'
       ]
   );
 };

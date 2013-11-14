@@ -37,7 +37,6 @@
     }
   });
   require(["modules/pmapi"], function (pmapi) {
-    console.log(pmapi);
     pmapi.run();
   });
 }());

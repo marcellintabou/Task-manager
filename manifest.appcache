@@ -27,7 +27,7 @@ lang/ch/translation.json
 
 js/lib/jio/complex_queries.js
 js/lib/jio/localstorage.js
-js/lib/jio/davstorage.js
+js/lib/jio/davstoage.js
 js/lib/jio/erp5storage.js
 js/lib/jio/gidstorage.js
 js/lib/jio/replicatestorage.js

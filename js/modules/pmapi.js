@@ -1258,7 +1258,6 @@ define(
           var start =  new Date(document.getElementById("start").value),
             end =  new Date(document.getElementById("stop").value),
             title = document.getElementById("title").value;
-
           if (title) {
             title = title.trim();
           }
@@ -1465,7 +1464,7 @@ define(
                         set_lang(curr_lang);
                       }
                     );
-                  } 
+                  }
                 }
               );
             }
